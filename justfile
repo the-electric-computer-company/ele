@@ -1,7 +1,10 @@
 default: test
 
 test:
-  cargo test
+	cargo test
+
+fmt:
+	cargo fmt
 
 doc:
-  cargo doc --all --open
+	cargo doc --all --open
