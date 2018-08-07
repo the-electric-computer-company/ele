@@ -37,13 +37,13 @@ install:
   - curl -sSf -o rustup-init.exe https://win.rustup.rs/
   - rustup-init.exe -y --default-host %TARGET% --default-toolchain %RUST_VERSION%
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
-  - rustup component add rustfmt-preview
+  - rustup component add rustfmt-preview --toolchain=nightly
   - rustc -Vv
   - cargo -V
 
 # DONE This is the "test phase", tweak it as you see fit
 test_script:
-  - cargo fmt -- --check
+  - cargo +nightly fmt -- --check
   # we don't run the "test phase" when doing deploys
   - if [%APPVEYOR_REPO_TAG%]==[false] (
       cargo build --target %TARGET% &&
