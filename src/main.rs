@@ -3,17 +3,13 @@
 #[macro_use]
 extern crate futures;
 
-use futures::{
-  FutureExt,
-  TryFutureExt,
-  compat::{
-    Future01CompatExt,
-    TokioDefaultExecutor,
-  },
-};
 use f1::{Future, Stream};
-use tokio::timer::Interval;
+use futures::{
+  compat::{Future01CompatExt, TokioDefaultExecutor},
+  FutureExt, TryFutureExt,
+};
 use std::time::{Duration, Instant};
+use tokio::timer::Interval;
 
 fn main() {
   let future = async {
@@ -22,17 +18,13 @@ fn main() {
       .for_each(|_| {
         println!("tick");
         Ok(())
-      })
-      .map_err(|e| panic!("timer error: {}", e));
+      }).map_err(|e| panic!("timer error: {}", e));
 
     let join_handle = spawn_with_handle!(timer.compat()).unwrap();
     await!(join_handle);
   };
 
-  let future_compat = future
-    .boxed()
-    .unit_error()
-    .compat(TokioDefaultExecutor);
+  let future_compat = future.boxed().unit_error().compat(TokioDefaultExecutor);
 
   tokio::run(future_compat);
 }
