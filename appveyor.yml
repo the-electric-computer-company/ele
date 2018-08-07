@@ -43,7 +43,7 @@ install:
 
 # DONE This is the "test phase", tweak it as you see fit
 test_script:
-  - cargo fmt -- --check
+  - cargo +nightly fmt -- --check
   # we don't run the "test phase" when doing deploys
   - if [%APPVEYOR_REPO_TAG%]==[false] (
       cargo build --target %TARGET% &&
