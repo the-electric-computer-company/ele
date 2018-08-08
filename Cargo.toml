@@ -1,19 +1,6 @@
-cargo-features = ["edition", "rename-dependency"]
-
 [package]
 name = "ele"
 version = "0.0.0"
 authors = ["The Electric Computer Company <team@electric.computer>"]
-edition = "2018"
 
 [dependencies]
-tokio = "0.1.7"
-
-[dependencies.futures-preview]
-git = "https://github.com/rust-lang-nursery/futures-rs"
-branch = "master"
-features = ["tokio-compat"]
-
-[dependencies.f1]
-package = "futures"
-version = "0.1"
