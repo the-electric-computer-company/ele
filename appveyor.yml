@@ -5,7 +5,7 @@ environment:
   global:
   # DONE This is the Rust channel that build jobs will use by default but can be
   # overridden on a case by case basis down below
-    RUST_VERSION: nightly
+    RUST_VERSION: stable
 
     # DONE Update this to match the name of your project.
     CRATE_NAME: ele
@@ -23,9 +23,9 @@ environment:
 
     # Testing other channels
     # - TARGET: x86_64-pc-windows-gnu
-    #   RUST_VERSION: nightly
+    #   RUST_VERSION: stable
     # - TARGET: x86_64-pc-windows-msvc
-    #   RUST_VERSION: nightly
+    #   RUST_VERSION: stable
 
 install:
   - ps: >-
@@ -37,13 +37,13 @@ install:
   - curl -sSf -o rustup-init.exe https://win.rustup.rs/
   - rustup-init.exe -y --default-host %TARGET% --default-toolchain %RUST_VERSION%
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
-  - rustup component add rustfmt-preview --toolchain=nightly
+  - rustup component add rustfmt-preview --toolchain=stable
   - rustc -Vv
   - cargo -V
 
 # DONE This is the "test phase", tweak it as you see fit
 test_script:
-  - cargo +nightly fmt -- --check
+  - cargo fmt -- --check
   # we don't run the "test phase" when doing deploys
   - if [%APPVEYOR_REPO_TAG%]==[false] (
       cargo build --target %TARGET% &&
@@ -73,7 +73,7 @@ deploy:
     # In this example, there are some targets that are tested using the stable
     # and nightly channels. This condition makes sure there is only one release
     # for such targets and that's generated using the stable channel
-    RUST_VERSION: nightly
+    RUST_VERSION: stable
     appveyor_repo_tag: true
   provider: GitHub
 
