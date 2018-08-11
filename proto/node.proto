@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+service Node {
+  rpc ArchiveHashGet(ArchiveHashGetRequest) returns (ArchiveHashGetResponse) {}
+  rpc ArchiveStream(ArchiveStreamRequest) returns (stream ArchiveStreamResponse) {}
+  rpc BundleCreate(BundleCreateRequest) returns (BundleCreateResponse) {}
+  rpc BundleDelete(BundleDeleteRequest) returns (BundleDeleteResponse) {}
+  rpc BundlePin(BundlePinRequest) returns(BundlePinResponse) {}
+  rpc BundleSearch(BundleSearchRequest) returns(BundleSearchResponse) {}
+  rpc BundleUnpin(BundleUnpinRequest) returns (BundleUnpinResponse) {}
+  rpc CollectionCreate(CollectionCreateRequest) returns(CollectionCreateResponse) {}
+  rpc CollectionSearch(CollectionSearchRequest) returns(CollectionSearchResponse) {}
+  rpc CollectionUpdate(CollectionUpdateRequest) returns(CollectionUpdateResponse) {}
+  rpc RecordGet(RecordGetRequest) returns (RecordGetResponse) {}
+  rpc Syndicate(SyndicateRequest) returns (SyndicateResponse) {}
+}
+
+// TODO: add request_id to every request
+// TODO: think about an id scheme with hash(node_id + user_id)
+
+message Error {
+  uint32 code = 1;
+  string message = 2;
+}
+
+message RequestId {}
+
+// TODO: fqn of node
+message NodeId {}
+
+// TODO: fqn of node + collection
+// /pubkey/PUBKEY/uuid/UUID ???
+// think about "multikey"
+message CollectionId {}
+
+// TODO: fqn of node + collection + bundle
+message BundleId {}
+
+// TODO: maybe a multihash
+message Hash {}
+
+message ArchiveStreamRequest {
+  RequestId request_id = 1;
+  BundleId  bundle_id = 2;
+}
+
+message ArchiveStreamResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  Hash  hash = 3;
+  // leaf nodes of merkle tree
+  bytes data = 4;
+}
+
+message ArchiveHashGetRequest {
+  RequestId request_id = 1;
+  BundleId  bundle_id = 2;
+}
+
+message ArchiveHashGetResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  Hash  hash = 3;
+}
+
+message CollectionCreateRequest {
+  RequestId request_id = 1;
+  NodeId node_id = 2;
+}
+
+message CollectionCreateResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  CollectionId collection_id = 3;
+}
+
+message CollectionUpdateRequest {
+  RequestId request_id = 1;
+  CollectionId collection_id = 2;
+  string name = 3;
+}
+
+message CollectionUpdateResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+}
+
+message CollectionSearchRequest {
+  RequestId request_id = 1;
+  NodeId node_id = 2;
+}
+
+message CollectionSearchResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  repeated CollectionId collection_ids = 3;
+}
+
+message BundleCreateRequest {
+  RequestId request_id = 1;
+  CollectionId collection_id = 2;
+  Hash hash = 3;
+  // tuple of (Record, Archive)
+  bytes data = 4;
+}
+
+message BundleCreateResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  BundleId bundle_id = 3;
+}
+
+message BundleDeleteRequest {
+  RequestId request_id = 1;
+  BundleId bundle_id = 2;
+}
+
+message BundleDeleteResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+}
+
+message SyndicateRequest {
+  RequestId request_id = 1;
+  BundleId bundle_id = 2;
+  CollectionId collection_id = 3;
+}
+
+message SyndicateResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  BundleId new_bundle_id = 3;
+}
+
+message BundleSearchRequest {
+  RequestId request_id = 1;
+  CollectionId collection_id = 3;
+}
+
+message BundleSearchResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  repeated BundleId bundle_ids = 3;
+}
+
+message BundlePinRequest {
+  RequestId request_id = 1;
+  BundleId bundle_id = 2;
+}
+
+message BundlePinResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+}
+
+message BundleUnpinRequest {
+  RequestId request_id = 1;
+  BundleId bundle_id = 2;
+}
+
+message BundleUnpinResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+}
+
+message RecordGetRequest {
+  RequestId request_id = 1;
+  BundleId bundle_id = 2;
+}
+
+message RecordGetResponse {
+  RequestId request_id = 1;
+  Error error = 2;
+  Hash record_hash = 3;
+  bytes record_data = 4;
+}

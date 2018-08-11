@@ -11,6 +11,8 @@ main() {
         return
     fi
 
+    cross fmt -- --check
+
     cross test --target $TARGET
     cross test --target $TARGET --release
 

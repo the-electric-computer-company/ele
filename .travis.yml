@@ -21,8 +21,8 @@ matrix:
     # Android
     # - env: TARGET=aarch64-linux-android DISABLE_TESTS=1
     # - env: TARGET=arm-linux-androideabi DISABLE_TESTS=1
-    - env: TARGET=armv7-linux-androideabi DISABLE_TESTS=1
-      rust: stable
+    # - env: TARGET=armv7-linux-androideabi DISABLE_TESTS=1
+    #   rust: stable
     # - env: TARGET=i686-linux-android DISABLE_TESTS=1
     # - env: TARGET=x86_64-linux-android DISABLE_TESTS=1
 
@@ -98,7 +98,6 @@ install:
   - source ~/.cargo/env || true
 
 script:
-  - cargo fmt -- --check
   - bash ci/script.sh
 
 after_script: set +e
