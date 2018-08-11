@@ -1,5 +1,2 @@
-
 /target
 **/*.rs.bk
-/src/node.rs
-/src/node_grpc.rs
