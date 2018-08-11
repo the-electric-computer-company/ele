@@ -16,3 +16,6 @@ log = "0.4.3"
 env_logger = "0.5.12"
 failure = "0.1.2"
 clap = "2.32.0"
+tls-api-native-tls = "0.1.20"
+uuid = { version = "0.6.5", features = ["serde", "v4"] }
+
