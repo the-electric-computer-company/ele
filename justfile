@@ -9,6 +9,9 @@ fmt:
 doc:
 	cargo doc --all --open
 
+run command='node':
+	cargo run -- {{command}}
+
 install-dev-deps-homebrew:
 	brew install protobuf
 
