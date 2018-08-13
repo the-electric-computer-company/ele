@@ -21,7 +21,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(
   name = "ele",
-  about = "Gateway to the world's content",
+  about = "💾 Share and enjoy",
   raw(setting = "AppSettings::InferSubcommands")
 )]
 enum Opt {
