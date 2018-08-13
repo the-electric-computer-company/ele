@@ -221,6 +221,8 @@ impl ::protobuf::reflect::ProtobufValue for Error {
 
 #[derive(PartialEq,Clone,Default)]
 pub struct RequestId {
+    // message fields
+    pub request_id: ::std::vec::Vec<u8>,
     // special fields
     unknown_fields: ::protobuf::UnknownFields,
     cached_size: ::protobuf::CachedSize,
@@ -229,6 +231,32 @@ pub struct RequestId {
 impl RequestId {
     pub fn new() -> RequestId {
         ::std::default::Default::default()
+    }
+
+    // bytes request_id = 1;
+
+    pub fn clear_request_id(&mut self) {
+        self.request_id.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_request_id(&mut self, v: ::std::vec::Vec<u8>) {
+        self.request_id = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_request_id(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.request_id
+    }
+
+    // Take field
+    pub fn take_request_id(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.request_id, ::std::vec::Vec::new())
+    }
+
+    pub fn get_request_id(&self) -> &[u8] {
+        &self.request_id
     }
 }
 
@@ -241,6 +269,9 @@ impl ::protobuf::Message for RequestId {
         while !is.eof()? {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.request_id)?;
+                },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
                 },
@@ -253,12 +284,18 @@ impl ::protobuf::Message for RequestId {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
+        if !self.request_id.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.request_id);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if !self.request_id.is_empty() {
+            os.write_bytes(1, &self.request_id)?;
+        }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -300,7 +337,12 @@ impl ::protobuf::Message for RequestId {
         };
         unsafe {
             descriptor.get(|| {
-                let fields = ::std::vec::Vec::new();
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "request_id",
+                    |m: &RequestId| { &m.request_id },
+                    |m: &mut RequestId| { &mut m.request_id },
+                ));
                 ::protobuf::reflect::MessageDescriptor::new::<RequestId>(
                     "RequestId",
                     fields,
@@ -323,6 +365,7 @@ impl ::protobuf::Message for RequestId {
 
 impl ::protobuf::Clear for RequestId {
     fn clear(&mut self) {
+        self.clear_request_id();
         self.unknown_fields.clear();
     }
 }
@@ -7183,90 +7226,90 @@ impl ::protobuf::reflect::ProtobufValue for RecordGetResponse {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\nnode.proto\"5\n\x05Error\x12\x12\n\x04code\x18\x01\x20\x01(\rR\x04co\
-    de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x0b\n\tRequestI\
-    d\"\x08\n\x06NodeId\"\x0e\n\x0cCollectionId\"\n\n\x08BundleId\"\x06\n\
-    \x04Hash\"i\n\x14ArchiveStreamRequest\x12)\n\nrequest_id\x18\x01\x20\x01\
-    (\x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t\
-    .BundleIdR\x08bundleId\"\x8f\x01\n\x15ArchiveStreamResponse\x12)\n\nrequ\
-    est_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\
-    \x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x12\x19\n\x04hash\x18\x03\x20\
-    \x01(\x0b2\x05.HashR\x04hash\x12\x12\n\x04data\x18\x04\x20\x01(\x0cR\x04\
-    data\"j\n\x15ArchiveHashGetRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\
-    \x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.\
-    BundleIdR\x08bundleId\"|\n\x16ArchiveHashGetResponse\x12)\n\nrequest_id\
-    \x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\
-    \x02\x20\x01(\x0b2\x06.ErrorR\x05error\x12\x19\n\x04hash\x18\x03\x20\x01\
-    (\x0b2\x05.HashR\x04hash\"f\n\x17CollectionCreateRequest\x12)\n\nrequest\
-    _id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x20\n\x07node_id\
-    \x18\x02\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"\x97\x01\n\x18CollectionCr\
-    eateResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequ\
-    estId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x122\
-    \n\rcollection_id\x18\x03\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId\
-    \"\x8c\x01\n\x17CollectionUpdateRequest\x12)\n\nrequest_id\x18\x01\x20\
-    \x01(\x0b2\n.RequestIdR\trequestId\x122\n\rcollection_id\x18\x02\x20\x01\
-    (\x0b2\r.CollectionIdR\x0ccollectionId\x12\x12\n\x04name\x18\x03\x20\x01\
-    (\tR\x04name\"c\n\x18CollectionUpdateResponse\x12)\n\nrequest_id\x18\x01\
-    \x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\
-    \x01(\x0b2\x06.ErrorR\x05error\"f\n\x17CollectionSearchRequest\x12)\n\nr\
-    equest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x20\n\x07nod\
-    e_id\x18\x02\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"\x99\x01\n\x18Collecti\
-    onSearchResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\t\
-    requestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\
-    \x124\n\x0ecollection_ids\x18\x03\x20\x03(\x0b2\r.CollectionIdR\rcollect\
-    ionIds\"\xa3\x01\n\x13BundleCreateRequest\x12)\n\nrequest_id\x18\x01\x20\
-    \x01(\x0b2\n.RequestIdR\trequestId\x122\n\rcollection_id\x18\x02\x20\x01\
-    (\x0b2\r.CollectionIdR\x0ccollectionId\x12\x19\n\x04hash\x18\x03\x20\x01\
-    (\x0b2\x05.HashR\x04hash\x12\x12\n\x04data\x18\x04\x20\x01(\x0cR\x04data\
-    \"\x87\x01\n\x14BundleCreateResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\
-    \x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\
-    \x06.ErrorR\x05error\x12&\n\tbundle_id\x18\x03\x20\x01(\x0b2\t.BundleIdR\
-    \x08bundleId\"h\n\x13BundleDeleteRequest\x12)\n\nrequest_id\x18\x01\x20\
-    \x01(\x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\
-    \x0b2\t.BundleIdR\x08bundleId\"_\n\x14BundleDeleteResponse\x12)\n\nreque\
-    st_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\
-    \x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\"\x99\x01\n\x10SyndicateReque\
-    st\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12&\
-    \n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundleId\x122\n\rcoll\
-    ection_id\x18\x03\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId\"\x8b\
-    \x01\n\x11SyndicateResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.R\
-    equestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\
-    \x05error\x12-\n\rnew_bundle_id\x18\x03\x20\x01(\x0b2\t.BundleIdR\x0bnew\
-    BundleId\"t\n\x13BundleSearchRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\
-    \x0b2\n.RequestIdR\trequestId\x122\n\rcollection_id\x18\x03\x20\x01(\x0b\
-    2\r.CollectionIdR\x0ccollectionId\"\x89\x01\n\x14BundleSearchResponse\
-    \x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\
-    \x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x12(\n\nbundle\
-    _ids\x18\x03\x20\x03(\x0b2\t.BundleIdR\tbundleIds\"e\n\x10BundlePinReque\
-    st\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12&\
-    \n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundleId\"\\\n\x11Bun\
-    dlePinResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\tre\
-    questId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\"g\
-    \n\x12BundleUnpinRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.Requ\
-    estIdR\trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleIdR\
-    \x08bundleId\"^\n\x13BundleUnpinResponse\x12)\n\nrequest_id\x18\x01\x20\
+    de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"*\n\tRequestId\
+    \x12\x1d\n\nrequest_id\x18\x01\x20\x01(\x0cR\trequestId\"\x08\n\x06NodeI\
+    d\"\x0e\n\x0cCollectionId\"\n\n\x08BundleId\"\x06\n\x04Hash\"i\n\x14Arch\
+    iveStreamRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\t\
+    requestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundleI\
+    d\"\x8f\x01\n\x15ArchiveStreamResponse\x12)\n\nrequest_id\x18\x01\x20\
     \x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\
-    \x0b2\x06.ErrorR\x05error\"e\n\x10RecordGetRequest\x12)\n\nrequest_id\
-    \x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_id\x18\x02\
-    \x20\x01(\x0b2\t.BundleIdR\x08bundleId\"\xa5\x01\n\x11RecordGetResponse\
+    \x0b2\x06.ErrorR\x05error\x12\x19\n\x04hash\x18\x03\x20\x01(\x0b2\x05.Ha\
+    shR\x04hash\x12\x12\n\x04data\x18\x04\x20\x01(\x0cR\x04data\"j\n\x15Arch\
+    iveHashGetRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\
+    \trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundl\
+    eId\"|\n\x16ArchiveHashGetResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\
+    \x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\
+    \x06.ErrorR\x05error\x12\x19\n\x04hash\x18\x03\x20\x01(\x0b2\x05.HashR\
+    \x04hash\"f\n\x17CollectionCreateRequest\x12)\n\nrequest_id\x18\x01\x20\
+    \x01(\x0b2\n.RequestIdR\trequestId\x12\x20\n\x07node_id\x18\x02\x20\x01(\
+    \x0b2\x07.NodeIdR\x06nodeId\"\x97\x01\n\x18CollectionCreateResponse\x12)\
+    \n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\
+    \x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x122\n\rcollection_i\
+    d\x18\x03\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId\"\x8c\x01\n\x17C\
+    ollectionUpdateRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.Reques\
+    tIdR\trequestId\x122\n\rcollection_id\x18\x02\x20\x01(\x0b2\r.Collection\
+    IdR\x0ccollectionId\x12\x12\n\x04name\x18\x03\x20\x01(\tR\x04name\"c\n\
+    \x18CollectionUpdateResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.\
+    RequestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.Error\
+    R\x05error\"f\n\x17CollectionSearchRequest\x12)\n\nrequest_id\x18\x01\
+    \x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x20\n\x07node_id\x18\x02\x20\
+    \x01(\x0b2\x07.NodeIdR\x06nodeId\"\x99\x01\n\x18CollectionSearchResponse\
     \x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\
-    \x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x12&\n\x0breco\
-    rd_hash\x18\x03\x20\x01(\x0b2\x05.HashR\nrecordHash\x12\x1f\n\x0brecord_\
-    data\x18\x04\x20\x01(\x0cR\nrecordData2\x8b\x06\n\x04Node\x12C\n\x0eArch\
-    iveHashGet\x12\x16.ArchiveHashGetRequest\x1a\x17.ArchiveHashGetResponse\
-    \"\0\x12B\n\rArchiveStream\x12\x15.ArchiveStreamRequest\x1a\x16.ArchiveS\
-    treamResponse\"\00\x01\x12=\n\x0cBundleCreate\x12\x14.BundleCreateReques\
-    t\x1a\x15.BundleCreateResponse\"\0\x12=\n\x0cBundleDelete\x12\x14.Bundle\
-    DeleteRequest\x1a\x15.BundleDeleteResponse\"\0\x124\n\tBundlePin\x12\x11\
-    .BundlePinRequest\x1a\x12.BundlePinResponse\"\0\x12=\n\x0cBundleSearch\
-    \x12\x14.BundleSearchRequest\x1a\x15.BundleSearchResponse\"\0\x12:\n\x0b\
-    BundleUnpin\x12\x13.BundleUnpinRequest\x1a\x14.BundleUnpinResponse\"\0\
-    \x12I\n\x10CollectionCreate\x12\x18.CollectionCreateRequest\x1a\x19.Coll\
-    ectionCreateResponse\"\0\x12I\n\x10CollectionSearch\x12\x18.CollectionSe\
-    archRequest\x1a\x19.CollectionSearchResponse\"\0\x12I\n\x10CollectionUpd\
-    ate\x12\x18.CollectionUpdateRequest\x1a\x19.CollectionUpdateResponse\"\0\
-    \x124\n\tRecordGet\x12\x11.RecordGetRequest\x1a\x12.RecordGetResponse\"\
-    \0\x124\n\tSyndicate\x12\x11.SyndicateRequest\x1a\x12.SyndicateResponse\
-    \"\0b\x06proto3\
+    \x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x124\n\x0ecoll\
+    ection_ids\x18\x03\x20\x03(\x0b2\r.CollectionIdR\rcollectionIds\"\xa3\
+    \x01\n\x13BundleCreateRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n\
+    .RequestIdR\trequestId\x122\n\rcollection_id\x18\x02\x20\x01(\x0b2\r.Col\
+    lectionIdR\x0ccollectionId\x12\x19\n\x04hash\x18\x03\x20\x01(\x0b2\x05.H\
+    ashR\x04hash\x12\x12\n\x04data\x18\x04\x20\x01(\x0cR\x04data\"\x87\x01\n\
+    \x14BundleCreateResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.Requ\
+    estIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\
+    \x05error\x12&\n\tbundle_id\x18\x03\x20\x01(\x0b2\t.BundleIdR\x08bundleI\
+    d\"h\n\x13BundleDeleteRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n\
+    .RequestIdR\trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleI\
+    dR\x08bundleId\"_\n\x14BundleDeleteResponse\x12)\n\nrequest_id\x18\x01\
+    \x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\
+    \x01(\x0b2\x06.ErrorR\x05error\"\x99\x01\n\x10SyndicateRequest\x12)\n\nr\
+    equest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_i\
+    d\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundleId\x122\n\rcollection_id\
+    \x18\x03\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId\"\x8b\x01\n\x11Sy\
+    ndicateResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\tr\
+    equestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\
+    \x12-\n\rnew_bundle_id\x18\x03\x20\x01(\x0b2\t.BundleIdR\x0bnewBundleId\
+    \"t\n\x13BundleSearchRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.\
+    RequestIdR\trequestId\x122\n\rcollection_id\x18\x03\x20\x01(\x0b2\r.Coll\
+    ectionIdR\x0ccollectionId\"\x89\x01\n\x14BundleSearchResponse\x12)\n\nre\
+    quest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05erro\
+    r\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x12(\n\nbundle_ids\x18\x03\
+    \x20\x03(\x0b2\t.BundleIdR\tbundleIds\"e\n\x10BundlePinRequest\x12)\n\nr\
+    equest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_i\
+    d\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundleId\"\\\n\x11BundlePinRespon\
+    se\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\
+    \x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\"g\n\x12Bundle\
+    UnpinRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequ\
+    estId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.BundleIdR\x08bundleId\"^\
+    \n\x13BundleUnpinResponse\x12)\n\nrequest_id\x18\x01\x20\x01(\x0b2\n.Req\
+    uestIdR\trequestId\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\
+    \x05error\"e\n\x10RecordGetRequest\x12)\n\nrequest_id\x18\x01\x20\x01(\
+    \x0b2\n.RequestIdR\trequestId\x12&\n\tbundle_id\x18\x02\x20\x01(\x0b2\t.\
+    BundleIdR\x08bundleId\"\xa5\x01\n\x11RecordGetResponse\x12)\n\nrequest_i\
+    d\x18\x01\x20\x01(\x0b2\n.RequestIdR\trequestId\x12\x1c\n\x05error\x18\
+    \x02\x20\x01(\x0b2\x06.ErrorR\x05error\x12&\n\x0brecord_hash\x18\x03\x20\
+    \x01(\x0b2\x05.HashR\nrecordHash\x12\x1f\n\x0brecord_data\x18\x04\x20\
+    \x01(\x0cR\nrecordData2\x8b\x06\n\x04Node\x12C\n\x0eArchiveHashGet\x12\
+    \x16.ArchiveHashGetRequest\x1a\x17.ArchiveHashGetResponse\"\0\x12B\n\rAr\
+    chiveStream\x12\x15.ArchiveStreamRequest\x1a\x16.ArchiveStreamResponse\"\
+    \00\x01\x12=\n\x0cBundleCreate\x12\x14.BundleCreateRequest\x1a\x15.Bundl\
+    eCreateResponse\"\0\x12=\n\x0cBundleDelete\x12\x14.BundleDeleteRequest\
+    \x1a\x15.BundleDeleteResponse\"\0\x124\n\tBundlePin\x12\x11.BundlePinReq\
+    uest\x1a\x12.BundlePinResponse\"\0\x12=\n\x0cBundleSearch\x12\x14.Bundle\
+    SearchRequest\x1a\x15.BundleSearchResponse\"\0\x12:\n\x0bBundleUnpin\x12\
+    \x13.BundleUnpinRequest\x1a\x14.BundleUnpinResponse\"\0\x12I\n\x10Collec\
+    tionCreate\x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateRespo\
+    nse\"\0\x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\
+    \x19.CollectionSearchResponse\"\0\x12I\n\x10CollectionUpdate\x12\x18.Col\
+    lectionUpdateRequest\x1a\x19.CollectionUpdateResponse\"\0\x124\n\tRecord\
+    Get\x12\x11.RecordGetRequest\x1a\x12.RecordGetResponse\"\0\x124\n\tSyndi\
+    cate\x12\x11.SyndicateRequest\x1a\x12.SyndicateResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

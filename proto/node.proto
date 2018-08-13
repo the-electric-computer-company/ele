@@ -23,7 +23,9 @@ message Error {
   string message = 2;
 }
 
-message RequestId {}
+message RequestId {
+  bytes request_id = 1;
+}
 
 // TODO: fqn of node
 message NodeId {}
