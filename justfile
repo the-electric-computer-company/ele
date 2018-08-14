@@ -7,7 +7,7 @@ fmt:
 	cargo fmt
 
 doc:
-	cargo doc --all --open
+	cargo rustdoc --open -- --document-private-items
 
 run command='node':
 	cargo run -- {{command}}
