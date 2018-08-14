@@ -7,7 +7,10 @@ fmt:
 	cargo fmt
 
 doc:
-	cargo doc --all --open
+  cargo rustdoc --open -- --no-defaults \
+        --passes collapse-docs   \
+        --passes unindent-comments \
+        --passes strip-priv-imports
 
 run command='node':
 	cargo run -- {{command}}
