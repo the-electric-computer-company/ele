@@ -15,10 +15,10 @@ extern crate env_logger;
 extern crate grpc;
 extern crate protobuf;
 extern crate rusqlite;
+extern crate sha2;
 extern crate tls_api;
 extern crate tls_api_native_tls;
 extern crate uuid;
-extern crate sha2;
 
 #[macro_use]
 mod show;

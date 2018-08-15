@@ -1,6 +1,6 @@
-use ::svc;
 use failure;
 use sha2::{Digest, Sha256};
+use svc;
 use uuid::Uuid;
 
 #[derive(PartialEq, Debug)]
@@ -361,11 +361,14 @@ mod tests {
   #[test]
   fn test_collection_create_response() {
     let first_req_id = RequestId::new();
-    let first_error = Error{code: 42, message: "foo".to_string()};
+    let first_error = Error {
+      code: 42,
+      message: "foo".to_string(),
+    };
     let first_node_id = NodeId::new();
     let first_col_id = CollectionId::new(first_node_id);
 
-    let first_col_create_resp = CollectionCreateResponse{
+    let first_col_create_resp = CollectionCreateResponse {
       request_id: first_req_id,
       error: first_error,
       collection_id: first_col_id,
