@@ -2,6 +2,8 @@
 extern crate log;
 #[macro_use]
 extern crate structopt;
+#[macro_use]
+extern crate failure;
 
 #[cfg(test)]
 extern crate assert_fs;
@@ -16,6 +18,7 @@ extern crate rusqlite;
 extern crate tls_api;
 extern crate tls_api_native_tls;
 extern crate uuid;
+extern crate sha2;
 
 #[macro_use]
 mod show;
@@ -31,6 +34,7 @@ mod platform;
 mod svc;
 
 use common::*;
+mod api;
 
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
