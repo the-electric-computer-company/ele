@@ -1,4 +1,4 @@
-use ::node;
+use ::svc;
 use failure;
 use uuid::{Uuid};
 use sha2::{Sha256, Digest};
@@ -10,14 +10,14 @@ struct Error {
 }
 
 impl Error {
-  fn from_protobuf(proto_error: &node::Error) -> Error {
+  fn from_protobuf(proto_error: &svc::Error) -> Error {
     let code = proto_error.get_code();
     let message = proto_error.get_message().to_string();
     Error{code, message}
   }
 
-  fn to_protobuf(&self) -> node::Error {
-    let mut proto_error = node::Error::new();
+  fn to_protobuf(&self) -> svc::Error {
+    let mut proto_error = svc::Error::new();
     proto_error.set_code(self.code);
     proto_error.set_message(self.message.clone());
     proto_error
@@ -34,14 +34,14 @@ impl RequestId {
     RequestId{id: Uuid::new_v4()}
   }
 
-  fn from_protobuf(mut proto_req_id: node::RequestId) -> Result<RequestId, failure::Error> {
+  fn from_protobuf(mut proto_req_id: svc::RequestId) -> Result<RequestId, failure::Error> {
     let vec = proto_req_id.take_request_id();
     Ok(RequestId{id: Uuid::from_bytes(vec.as_slice())?})
   }
 
-  fn to_protobuf(&self) -> node::RequestId {
+  fn to_protobuf(&self) -> svc::RequestId {
     let buf = self.id.as_bytes().to_vec();
-    let mut protobuf_req_id = node::RequestId::new();
+    let mut protobuf_req_id = svc::RequestId::new();
     protobuf_req_id.set_request_id(buf);
     protobuf_req_id
   }
@@ -64,15 +64,15 @@ impl Pubkey {
     }
   }
 
-  fn from_protobuf(proto_pubkey: &node::Pubkey) -> Result<Pubkey, failure::Error> {
+  fn from_protobuf(proto_pubkey: &svc::Pubkey) -> Result<Pubkey, failure::Error> {
     let vec = proto_pubkey.get_key().to_vec();
     // make sure it's a valid uuid
     let uuid = Uuid::from_bytes(vec.as_slice())?;
     Ok(Pubkey::from_bytes(uuid.as_bytes()))
   }
 
-  fn to_protobuf(&self) -> node::Pubkey {
-    let mut proto_pubkey = node::Pubkey::new();
+  fn to_protobuf(&self) -> svc::Pubkey {
+    let mut proto_pubkey = svc::Pubkey::new();
     proto_pubkey.set_key(self.key.clone());
     proto_pubkey
   }
@@ -89,13 +89,13 @@ impl NodeId {
     NodeId{node_pubkey}
   }
 
-  fn from_protobuf(proto_node_id: &node::NodeId) -> Result<NodeId, failure::Error> {
+  fn from_protobuf(proto_node_id: &svc::NodeId) -> Result<NodeId, failure::Error> {
     let node_pubkey = Pubkey::from_protobuf(proto_node_id.get_node_pubkey())?;
     Ok(NodeId{node_pubkey})
   }
 
-  fn to_protobuf(&self) -> node::NodeId {
-    let mut proto_node_id = node::NodeId::new();
+  fn to_protobuf(&self) -> svc::NodeId {
+    let mut proto_node_id = svc::NodeId::new();
     proto_node_id.set_node_pubkey(self.node_pubkey.to_protobuf());
     proto_node_id
   }
@@ -113,14 +113,14 @@ impl CollectionId {
     CollectionId{node_id, collection_pubkey}
   }
 
-  fn from_protobuf(proto_collection_id: &node::CollectionId) -> Result<CollectionId, failure::Error> {
+  fn from_protobuf(proto_collection_id: &svc::CollectionId) -> Result<CollectionId, failure::Error> {
     let node_id = NodeId::from_protobuf(proto_collection_id.get_node_id())?;
     let collection_pubkey = Pubkey::from_protobuf(proto_collection_id.get_collection_pubkey())?;
     Ok(CollectionId{node_id, collection_pubkey})
   }
 
-  fn to_protobuf(&self) -> node::CollectionId {
-    let mut proto_collection_id = node::CollectionId::new();
+  fn to_protobuf(&self) -> svc::CollectionId {
+    let mut proto_collection_id = svc::CollectionId::new();
     proto_collection_id.set_node_id(self.node_id.to_protobuf());
     proto_collection_id.set_collection_pubkey(self.collection_pubkey.to_protobuf());
     proto_collection_id
@@ -139,14 +139,14 @@ impl BundleId {
     BundleId{collection_id, bundle_id}
   }
 
-  fn from_protobuf(proto_bundle_id: &node::BundleId) -> Result<BundleId, failure::Error> {
+  fn from_protobuf(proto_bundle_id: &svc::BundleId) -> Result<BundleId, failure::Error> {
     let collection_id = CollectionId::from_protobuf(proto_bundle_id.get_collection_id())?;
     let bundle_id = Uuid::from_bytes(proto_bundle_id.get_bundle_id())?;
     Ok(BundleId{collection_id, bundle_id})
   }
 
-  fn to_protobuf(&self) -> node::BundleId {
-    let mut bundle_id = node::BundleId::new();
+  fn to_protobuf(&self) -> svc::BundleId {
+    let mut bundle_id = svc::BundleId::new();
     bundle_id.set_collection_id(self.collection_id.to_protobuf());
     bundle_id.set_bundle_id(self.bundle_id.as_bytes().to_vec());
     bundle_id
@@ -166,7 +166,7 @@ impl Hash {
     Hash{sha256: result.to_vec()}
   }
 
-  fn from_protobuf(hash: &node::Hash) -> Result<Hash, failure::Error> {
+  fn from_protobuf(hash: &svc::Hash) -> Result<Hash, failure::Error> {
     let bytes = hash.get_hash();
     if bytes.len() == 32 {
       Ok(Hash{sha256: bytes.to_vec()})
@@ -175,8 +175,8 @@ impl Hash {
     }
   }
 
-  fn to_protobuf(&self) -> node::Hash {
-    let mut proto_hash = node::Hash::new();
+  fn to_protobuf(&self) -> svc::Hash {
+    let mut proto_hash = svc::Hash::new();
     proto_hash.set_hash(self.sha256.clone());
     proto_hash
   }
@@ -215,7 +215,7 @@ mod tests {
     let mut protobuf_req_id_out = first_req_id.to_protobuf();
     assert_eq!(protobuf_req_id_out.take_request_id(), buf);
 
-    let mut protobuf_req_id_in = node::RequestId::new();
+    let mut protobuf_req_id_in = svc::RequestId::new();
     protobuf_req_id_in.set_request_id(buf.clone());
     let second_req_id = RequestId::from_protobuf(protobuf_req_id_in).unwrap();
     assert_eq!(second_req_id, first_req_id);
