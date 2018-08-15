@@ -3,6 +3,10 @@ default: test
 
 log='warn'
 
+bt='0'
+
+export RUST_BACKTRACE = bt
+
 # run tests
 test:
 	cargo test
@@ -12,9 +16,13 @@ fmt:
 	cargo fmt
 
 # run linter
-lint:
-	@echo Running clippy...
-	@cargo +nightly clippy -- \
+@lint:
+	echo Checking for TODO/FIX/XXX...
+	! grep --color -En 'TODO|FIX|XXX' src/*.rs
+	echo Checking for lines over 100 columns...
+	! grep --color -En '.{101}' src/*.rs
+	echo Invoking clippy...
+	cargo +nightly clippy -- \
 		-D clippy \
 		-D clippy_style \
 		-D clippy_complexity \
@@ -40,6 +48,11 @@ check:
 # count non-empty lines of code
 sloc:
 	@cat src/*.rs | sed '/^\s*$/d' | wc -l
+
+pr: fmt lint test
+	git diff --no-ext-diff --quiet --exit-code
+	[ `git rev-parse --abbrev-ref HEAD` != master ]
+	git push upstream
 
 # run a command, defaulting to `node`
 run command='node': build

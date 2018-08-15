@@ -1,10 +1,13 @@
 use common::*;
 
-use rusqlite::Connection;
+use rusqlite::{self, types::FromSql, Connection, Row};
+
+const SQLITE_DATABASE_APPLICATION_ID: i32 = 0x1337_0000;
 
 #[derive(Debug)]
 pub struct Library {
-  _connection: Connection,
+  connection: Connection,
+  database_path: PathBuf,
 }
 
 impl Library {
@@ -15,12 +18,12 @@ impl Library {
     path
   }
 
-  pub fn with_path(library_path: impl AsRef<Path>) -> Result<Library, Error> {
-    let library_path = library_path.as_ref().to_path_buf();
+  pub fn with_path(database_path: impl AsRef<Path>) -> Result<Library, Error> {
+    let database_path = database_path.as_ref().to_path_buf();
 
-    if library_path.extension() != Some(OsStr::new("db")) {
+    if database_path.extension() != Some(OsStr::new("db")) {
       return Err(Error::LibraryPathExtension {
-        library_path: library_path.clone(),
+        database_path: database_path.clone(),
       });
     }
 
@@ -28,7 +31,7 @@ impl Library {
       // This unwrap is safe, since we assert above that the
       // path must have an extension, which means it must
       // have at least one component
-      let app_directory_path = library_path.parent().unwrap();
+      let app_directory_path = database_path.parent().unwrap();
 
       let mut ancestors = app_directory_path.ancestors().collect::<Vec<&Path>>();
       ancestors.reverse();
@@ -62,28 +65,109 @@ impl Library {
       }
     }
 
-    let pre_existing = library_path.exists();
+    let pre_existing = database_path.exists();
 
     if pre_existing {
       info!(
         "Opening pre-existing library database at `{}`...",
-        library_path.display()
+        database_path.display()
       );
     } else {
       info!(
         "Creating new library database at `{}`...",
-        library_path.display()
+        database_path.display()
       );
     }
 
     let connection =
-      Connection::open(&library_path).map_err(|sqlite_error| Error::LibraryDatabase {
+      Connection::open(&database_path).map_err(|sqlite_error| Error::LibrarySqlite {
         sqlite_error,
-        library_path,
+        statement: None,
+        database_path: database_path.clone(),
       })?;
 
-    Ok(Library {
-      _connection: connection,
+    let library = Library {
+      connection,
+      database_path,
+    };
+
+    if pre_existing {
+      library.check_application_id()?;
+    } else {
+      library.set_application_id()?;
+      library.set_journal_mode()?;
+    }
+
+    Ok(library)
+  }
+
+  fn application_id(&self) -> Result<i32, Error> {
+    let statement = "PRAGMA application_id;";
+
+    self.query_scalar::<i32>(statement)
+  }
+
+  fn set_application_id(&self) -> Result<(), Error> {
+    let statement = format!(
+      "PRAGMA application_id = {};",
+      SQLITE_DATABASE_APPLICATION_ID
+    );
+
+    self.execute(&statement)
+  }
+
+  fn set_journal_mode(&self) -> Result<(), Error> {
+    self.query_scalar::<String>("PRAGMA journal_mode = WAL;")?;
+    Ok(())
+  }
+
+  fn execute(&self, statement: &str) -> Result<(), Error> {
+    self
+      .connection
+      .execute(statement, &[])
+      .embellish(self, statement)
+      .map(|_| ())
+  }
+
+  fn query_scalar<T: FromSql>(&self, statement: &str) -> Result<T, Error> {
+    fn get<T: FromSql>(row: &Row) -> T {
+      row.get(0)
+    }
+
+    self
+      .connection
+      .query_row(statement, &[], get::<T>)
+      .embellish(self, statement)
+  }
+
+  fn check_application_id(&self) -> Result<(), Error> {
+    let application_id = self.application_id()?;
+
+    if application_id != SQLITE_DATABASE_APPLICATION_ID {
+      Err(Error::LibraryApplicationId {
+        application_id,
+        database_path: self.database_path.clone(),
+      })
+    } else {
+      Ok(())
+    }
+  }
+}
+
+/// Extension trait for Result<T, rusqlite::Error>
+trait SqliteResultExt<T> {
+  /// Convert a `rusqlite::Error` to an `Error`, which additionally includes
+  /// the path to the library database, as well as the statement that caused
+  /// the error.
+  fn embellish(self, library: &Library, statement: &str) -> Result<T, Error>;
+}
+
+impl<T> SqliteResultExt<T> for Result<T, rusqlite::Error> {
+  fn embellish(self, library: &Library, statement: &str) -> Result<T, Error> {
+    self.map_err(|sqlite_error| Error::LibrarySqlite {
+      sqlite_error,
+      statement: Some(statement.to_string()),
+      database_path: library.database_path.clone(),
     })
   }
 }
@@ -121,22 +205,29 @@ mod test {
   #[test]
   fn db_extension_required() {
     match Library::with_path("foo.bar") {
-      Err(Error::LibraryPathExtension { library_path }) => {
-        assert_eq!(library_path, PathBuf::from("foo.bar"))
+      Err(Error::LibraryPathExtension { database_path }) => {
+        assert_eq!(database_path, PathBuf::from("foo.bar"))
       }
       otherwise => panic!("unexpected result: {:?}", otherwise),
     }
   }
 
   #[test]
-  fn library_with_path() {
+  fn creation() {
     let tempdir = TempDir::new().unwrap();
 
     let db = tempdir.child("hello.db");
 
-    Library::with_path(db.path()).unwrap();
+    let library = Library::with_path(db.path()).unwrap();
 
     db.assert(predicate::path::is_file());
+
+    assert_eq!(
+      library
+        .query_scalar::<String>("PRAGMA journal_mode;")
+        .unwrap(),
+      "wal"
+    );
   }
 
   #[test]
@@ -198,12 +289,13 @@ mod test {
     let db = tempdir.child("sub/library.db");
 
     match Library::with_path(db.path()) {
-      Err(Error::LibraryDatabase {
+      Err(Error::LibrarySqlite {
         sqlite_error: SqliteFailure(_, Some(message)),
-        library_path,
+        statement: None,
+        database_path,
       }) => {
         assert_eq!(message, "unable to open database file");
-        assert_eq!(library_path, db.path().to_path_buf());
+        assert_eq!(database_path, db.path().to_path_buf());
       }
       otherwise => panic!("unexpected result: {:?}", otherwise),
     }
@@ -237,6 +329,50 @@ mod test {
     match Library::with_path(db.path()) {
       Err(Error::AppDirectoryIo { path, .. }) => assert_eq!(path, foo.path()),
       otherwise => panic!("unexpected result: {:?}", otherwise),
+    }
+  }
+
+  #[test]
+  fn bad_app_id() {
+    {
+      let tempdir = TempDir::new().unwrap();
+
+      let db = tempdir.child("library.db");
+
+      Connection::open(db.path()).unwrap();
+
+      match Library::with_path(db.path()) {
+        Err(Error::LibraryApplicationId {
+          database_path,
+          application_id,
+        }) => {
+          assert_eq!(application_id, 0);
+          assert_eq!(database_path, db.path());
+        }
+        otherwise => panic!("unexpected result: {:?}", otherwise),
+      }
+    }
+
+    {
+      let tempdir = TempDir::new().unwrap();
+
+      let db = tempdir.child("library.db");
+
+      Connection::open(db.path())
+        .unwrap()
+        .execute("PRAGMA application_id = 10;", &[])
+        .unwrap();
+
+      match Library::with_path(db.path()) {
+        Err(Error::LibraryApplicationId {
+          database_path,
+          application_id,
+        }) => {
+          assert_eq!(application_id, 10);
+          assert_eq!(database_path, db.path());
+        }
+        otherwise => panic!("unexpected result: {:?}", otherwise),
+      }
     }
   }
 }

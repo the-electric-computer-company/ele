@@ -9,10 +9,16 @@ pub enum Error {
   /// Application directory was not a directory
   AppDirectoryNotDirectory { path: PathBuf },
   /// Library file path had extension other than `.db`
-  LibraryPathExtension { library_path: PathBuf },
+  LibraryPathExtension { database_path: PathBuf },
   /// Error accessing the library database
-  LibraryDatabase {
+  LibrarySqlite {
     sqlite_error: rusqlite::Error,
-    library_path: PathBuf,
+    statement: Option<String>,
+    database_path: PathBuf,
+  },
+  /// Pre-existing library database had an invalid application id
+  LibraryApplicationId {
+    application_id: i32,
+    database_path: PathBuf,
   },
 }
