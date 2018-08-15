@@ -1,5 +1,6 @@
 use failure;
 use sha2::{Digest, Sha256};
+use std::iter;
 use svc;
 use uuid::Uuid;
 
@@ -234,7 +235,7 @@ impl CollectionCreateRequest {
 #[derive(PartialEq, Debug)]
 struct CollectionCreateResponse {
   request_id: RequestId,
-  error: Error,
+  error: Option<Error>,
   collection_id: CollectionId,
 }
 
@@ -243,7 +244,12 @@ impl CollectionCreateResponse {
     proto_resp: &svc::CollectionCreateResponse,
   ) -> Result<CollectionCreateResponse, failure::Error> {
     let request_id = RequestId::from_protobuf(proto_resp.get_request_id())?;
-    let error = Error::from_protobuf(proto_resp.get_error())?;
+    let error = if proto_resp.has_error() {
+      Some(Error::from_protobuf(proto_resp.get_error())?)
+    } else {
+      None
+    };
+
     let collection_id = CollectionId::from_protobuf(proto_resp.get_collection_id())?;
     Ok(CollectionCreateResponse {
       request_id,
@@ -255,7 +261,9 @@ impl CollectionCreateResponse {
   fn to_protobuf(&self) -> svc::CollectionCreateResponse {
     let mut proto_resp = svc::CollectionCreateResponse::new();
     proto_resp.set_request_id(self.request_id.to_protobuf());
-    proto_resp.set_error(self.error.to_protobuf());
+    if let Some(ref error) = self.error {
+      proto_resp.set_error(error.to_protobuf());
+    }
     proto_resp.set_collection_id(self.collection_id.to_protobuf());
     proto_resp
   }
@@ -287,6 +295,11 @@ mod tests {
     protobuf_req_id_in.set_request_id(buf.clone());
     let second_req_id = RequestId::from_protobuf(&protobuf_req_id_in).unwrap();
     assert_eq!(second_req_id, first_req_id);
+
+    let mut bad_req_id = svc::RequestId::new();
+    let bad_uuid: Vec<u8> = vec![1, 2, 4];
+    bad_req_id.set_request_id(bad_uuid);
+    RequestId::from_protobuf(&bad_req_id).expect_err("bad uuid should have caused an error");
   }
 
   #[test]
@@ -297,6 +310,11 @@ mod tests {
 
     let second_pubkey = Pubkey::from_protobuf(&proto_pubkey).unwrap();
     assert_eq!(first_pubkey, second_pubkey);
+
+    let mut bad_pubkey = svc::Pubkey::new();
+    let bad_uuid: Vec<u8> = vec![1, 2, 4];
+    bad_pubkey.set_key(bad_uuid);
+    Pubkey::from_protobuf(&bad_pubkey).expect_err("bad uuid should have caused an error");
   }
 
   #[test]
@@ -306,6 +324,9 @@ mod tests {
 
     let second_node_id = NodeId::from_protobuf(&proto_node_id).unwrap();
     assert_eq!(second_node_id, first_node_id);
+
+    let proto_empty_node_id = svc::NodeId::new();
+    NodeId::from_protobuf(&proto_empty_node_id).expect_err("expected error from empty node id");
   }
 
   #[test]
@@ -331,6 +352,15 @@ mod tests {
     let proto_bundle_id = first_bundle_id.to_protobuf();
     let second_bundle_id = BundleId::from_protobuf(&proto_bundle_id).unwrap();
     assert_eq!(second_bundle_id, first_bundle_id);
+
+    let second_node_id = NodeId::new();
+    let second_collection_id = CollectionId::new(second_node_id);
+    let bad_bundle_id: Vec<u8> = iter::repeat(1).take(17).collect();
+    let mut proto_bad_bundle_id = svc::BundleId::new();
+    proto_bad_bundle_id.set_collection_id(second_collection_id.to_protobuf());
+    proto_bad_bundle_id.set_bundle_id(bad_bundle_id);
+    BundleId::from_protobuf(&proto_bad_bundle_id)
+      .expect_err("expected error from bundle id of invalid length");
   }
 
   #[test]
@@ -341,6 +371,12 @@ mod tests {
     assert_eq!(second_hash, first_hash);
     let different_hash = Hash::sha256_digest(b"Stop all the downloadin'");
     assert_ne!(different_hash, second_hash);
+
+    let bad_hash: Vec<u8> = iter::repeat(1).take(31).collect();
+    let mut proto_bad_hash = svc::Hash::new();
+    proto_bad_hash.set_hash(bad_hash);
+    Hash::from_protobuf(&proto_bad_hash)
+      .expect_err("expected error for a byte string of invalid length");
   }
 
   #[test]
@@ -370,7 +406,7 @@ mod tests {
 
     let first_col_create_resp = CollectionCreateResponse {
       request_id: first_req_id,
-      error: first_error,
+      error: Some(first_error),
       collection_id: first_col_id,
     };
 
