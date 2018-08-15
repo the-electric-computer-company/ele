@@ -5,6 +5,8 @@ log='warn'
 
 bt='0'
 
+version = `head -3 Cargo.toml | sed -En 's/^version[[:space:]]*=[[:space:]]*"([^"]+)"/v\1/p'`
+
 export RUST_BACKTRACE = bt
 
 # run tests
@@ -18,9 +20,9 @@ fmt:
 # run linter
 @lint:
 	echo Checking for TODO/FIX/XXX...
-	! grep --color -En 'TODO|FIX|XXX' src/*.rs
+	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src 
 	echo Checking for lines over 100 columns...
-	! grep --color -En '.{101}' src/*.rs
+	! grep --color -Ern --exclude-dir=src/svc '.{101}' src
 	echo Invoking clippy...
 	cargo +nightly clippy -- \
 		-D clippy \
@@ -49,15 +51,20 @@ check:
 sloc:
 	@cat src/*.rs | sed '/^\s*$/d' | wc -l
 
-pr: fmt lint test
+# assert that the repo has no staged or unstaged changes
+assert-clean:
 	git diff --no-ext-diff --quiet --exit-code
+
+# push the current branch to origin
+pr: fmt lint test assert-clean
 	[ `git rev-parse --abbrev-ref HEAD` != master ]
-	git push upstream
+	git push origin
 
 # run a command, defaulting to `node`
 run command='node': build
 	RUST_LOG={{log}} ./target/debug/ele {{command}}
 
+# install development dependencies
 install-dev-deps:
 	# for `lint` recipe
 	rustup component add clippy-preview --toolchain=nightly
@@ -77,3 +84,31 @@ install-dev-deps-apt:
 # configure git to skip diffing generated code
 configure-nodiff-driver:
 	git config diff.nodiff.command true
+
+# To tag and publish a release:
+#
+# - PR and merge all changes for release
+# - `git co master && git pull --rebase origin master`
+# - `git branch -b release-{{version}}`
+# - `just tag`
+# - Open PR with `release-{{version}}` branch, wait for tests to pass, and merge
+# - Wait for release binaries to appear on github (this process is kicked off by `just tag`)
+# - `git co master && git pull --rebase origin master`
+# - `just publish`
+
+# create a release tag and push it to github
+tag: fmt lint test assert-clean
+	[ `git rev-parse --abbrev-ref HEAD` == release-{{version}} ]
+	git diff --no-ext-diff --quiet --exit-code master
+	cargo test --release
+	git tag -a {{version}} -m 'Release {{version}}'
+	git push origin release-{{version}}
+	git push origin {{version}}
+
+# publish a release to crates.io
+publish: fmt lint test assert-clean
+	[ `git rev-parse --abbrev-ref HEAD` == master ]
+	git fetch
+	git checkout {{version}}
+	cargo publish
+
