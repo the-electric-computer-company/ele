@@ -55,10 +55,10 @@ sloc:
 assert-clean:
 	git diff --no-ext-diff --quiet --exit-code
 
-# push the current branch to upstream
+# push the current branch to origin
 pr: fmt lint test assert-clean
 	[ `git rev-parse --abbrev-ref HEAD` != master ]
-	git push upstream
+	git push origin
 
 # run a command, defaulting to `node`
 run command='node': build
@@ -88,12 +88,12 @@ configure-nodiff-driver:
 # To tag and publish a release:
 #
 # - PR and merge all changes for release
-# - `git co master && git pull --rebase upstream master`
+# - `git co master && git pull --rebase origin master`
 # - `git branch -b release-{{version}}`
 # - `just tag`
 # - Open PR with `release-{{version}}` branch, wait for tests to pass, and merge
 # - Wait for release binaries to appear on github (this process is kicked off by `just tag`)
-# - `git co master && git pull --rebase upstream master`
+# - `git co master && git pull --rebase origin master`
 #	- `just publish`
 
 # create a release tag and push it to github
@@ -102,8 +102,8 @@ tag: fmt lint test assert-clean
 	git diff --no-ext-diff --quiet --exit-code master
 	cargo test --release
 	git tag -a {{version}} -m 'Release {{version}}'
-	git push upstream release-{{version}}
-	git push upstream {{version}}
+	git push origin release-{{version}}
+	git push origin {{version}}
 
 # publish a release to crates.io
 publish: fmt lint test assert-clean
