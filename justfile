@@ -20,9 +20,9 @@ fmt:
 # run linter
 @lint:
 	echo Checking for TODO/FIX/XXX...
-	! grep --color -En 'TODO|FIX|XXX' src/*.rs
+	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src 
 	echo Checking for lines over 100 columns...
-	! grep --color -En '.{101}' src/*.rs
+	! grep --color -Ern --exclude-dir=src/svc '.{101}' src
 	echo Invoking clippy...
 	cargo +nightly clippy -- \
 		-D clippy \
