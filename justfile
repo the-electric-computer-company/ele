@@ -94,7 +94,7 @@ configure-nodiff-driver:
 # - Open PR with `release-{{version}}` branch, wait for tests to pass, and merge
 # - Wait for release binaries to appear on github (this process is kicked off by `just tag`)
 # - `git co master && git pull --rebase origin master`
-#	- `just publish`
+# - `just publish`
 
 # create a release tag and push it to github
 tag: fmt lint test assert-clean
