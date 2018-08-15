@@ -27,9 +27,9 @@ matrix:
     # - env: TARGET=x86_64-linux-android DISABLE_TESTS=1
 
     # iOS
-    - env: TARGET=aarch64-apple-ios DISABLE_TESTS=1
-      rust: stable
-      os: osx
+    # - env: TARGET=aarch64-apple-ios DISABLE_TESTS=1
+    #   rust: stable
+    #   os: osx
     # - env: TARGET=armv7-apple-ios DISABLE_TESTS=1
     #   os: osx
     # - env: TARGET=armv7s-apple-ios DISABLE_TESTS=1
@@ -66,8 +66,8 @@ matrix:
 
     # *BSD
     # - env: TARGET=i686-unknown-freebsd DISABLE_TESTS=1
-    - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
-      rust: stable
+    # - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
+    #   rust: stable
     # - env: TARGET=x86_64-unknown-netbsd DISABLE_TESTS=1
 
     # Windows
