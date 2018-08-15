@@ -97,7 +97,7 @@ mod test {
   use predicates::prelude::*;
 
   #[test]
-  fn base_path_correct_suffix() -> Result<(), Error> {
+  fn base_path_correct_suffix() {
     let default_path = Library::default_path();
 
     let components = default_path.components().collect::<Vec<_>>();
@@ -116,8 +116,6 @@ mod test {
       components[components.len() - 1],
       Normal(OsStr::new("library.db")),
     );
-
-    Ok(())
   }
 
   #[test]
@@ -131,24 +129,22 @@ mod test {
   }
 
   #[test]
-  fn library_with_path() -> io::Result<()> {
-    let tempdir = TempDir::new()?;
+  fn library_with_path() {
+    let tempdir = TempDir::new().unwrap();
 
     let db = tempdir.child("hello.db");
 
     Library::with_path(db.path()).unwrap();
 
     db.assert(predicate::path::is_file());
-
-    Ok(())
   }
 
   #[test]
-  fn library_with_non_directory_path() -> io::Result<()> {
-    let tempdir = TempDir::new()?;
+  fn library_with_non_directory_path() {
+    let tempdir = TempDir::new().unwrap();
 
     let foo = tempdir.child("foo");
-    foo.touch()?;
+    foo.touch().unwrap();
 
     let db = tempdir.child("foo/library.db");
 
@@ -158,13 +154,11 @@ mod test {
       }
       otherwise => panic!("unexpected result: {:?}", otherwise),
     }
-
-    Ok(())
   }
 
   #[test]
-  fn intermediate_directory_creation() -> io::Result<()> {
-    let tempdir = TempDir::new()?;
+  fn intermediate_directory_creation() {
+    let tempdir = TempDir::new().unwrap();
 
     let foo = tempdir.child("foo");
 
@@ -176,32 +170,30 @@ mod test {
 
     foo.assert(predicate::path::is_dir());
     bar.assert(predicate::path::is_dir());
-
-    Ok(())
   }
 
   #[test]
-  fn no_permission() -> io::Result<()> {
+  fn no_permission() {
     // Appveyor tests run as the superuser, who ignores the
     // read-only permission, which causes this test to fail.
-    if env::var_os("APPVEYOR").is_some() {
-      return Ok(());
+    if running_on_appveyor() {
+      return;
     }
 
     use rusqlite::Error::SqliteFailure;
 
-    let tempdir = TempDir::new()?;
+    let tempdir = TempDir::new().unwrap();
 
     let sub = tempdir.child("sub");
     let path = sub.path();
 
-    fs::create_dir(path)?;
+    fs::create_dir(path).unwrap();
 
-    let mut permissions = path.metadata()?.permissions();
+    let mut permissions = path.metadata().unwrap().permissions();
 
     permissions.set_readonly(true);
 
-    fs::set_permissions(path, permissions)?;
+    fs::set_permissions(path, permissions).unwrap();
 
     let db = tempdir.child("sub/library.db");
 
@@ -215,26 +207,30 @@ mod test {
       }
       otherwise => panic!("unexpected result: {:?}", otherwise),
     }
-
-    Ok(())
   }
 
   #[test]
-  fn app_directory_io_error() -> io::Result<()> {
-    let tempdir = TempDir::new()?;
+  fn app_directory_io_error() {
+    // Appveyor tests run as the superuser, who ignores the
+    // read-only permission, which causes this test to fail.
+    if running_on_appveyor() {
+      return;
+    }
+
+    let tempdir = TempDir::new().unwrap();
 
     let sub = tempdir.child("sub");
     let path = sub.path();
 
-    fs::create_dir(path)?;
+    fs::create_dir(path).unwrap();
 
-    let mut permissions = path.metadata()?.permissions();
+    let mut permissions = path.metadata().unwrap().permissions();
 
     permissions.set_readonly(true);
 
     let foo = tempdir.child("sub/foo");
 
-    fs::set_permissions(path, permissions)?;
+    fs::set_permissions(path, permissions).unwrap();
 
     let db = tempdir.child("sub/foo/library.db");
 
@@ -242,7 +238,5 @@ mod test {
       Err(Error::AppDirectoryIo { path, .. }) => assert_eq!(path, foo.path()),
       otherwise => panic!("unexpected result: {:?}", otherwise),
     }
-
-    Ok(())
   }
 }

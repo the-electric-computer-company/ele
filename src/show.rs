@@ -10,8 +10,10 @@
 #[allow(unused_macros)]
 macro_rules! show {
   ($($expr:tt,)*) => {
-    $(
-      eprintln!("`{}` = {:?}", stringify!($expr), $expr);
-    )*
+    {
+      $(
+        eprintln!("`{}` = {:?}", stringify!($expr), $expr);
+      )*
+    }
   };
 }

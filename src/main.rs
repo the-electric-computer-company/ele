@@ -20,6 +20,9 @@ extern crate uuid;
 #[macro_use]
 mod show;
 
+#[cfg(test)]
+mod testing;
+
 mod common;
 mod error;
 mod library;
