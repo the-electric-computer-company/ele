@@ -46,13 +46,10 @@ test_script:
   - cargo fmt -- --check
   # we don't run the "test phase" when doing deploys
   - if [%APPVEYOR_REPO_TAG%]==[false] (
-      cargo rustc --target %TARGET% &&
-      cargo rustc --target %TARGET% --release &&
-      cargo fmt -- --check                                                       &&
-      cargo test --target %TARGET%                                               &&
-      cargo test --target %TARGET% --release                                     &&
-      cargo run --target %TARGET% -- --version                                   &&
-      cargo run --target %TARGET% --release -- --version
+      cargo rustc --target %TARGET%                      &&
+      cargo fmt -- --check                               &&
+      cargo test --target %TARGET%                       &&
+      cargo run --target %TARGET% -- --version
     )
 
 before_deploy:
