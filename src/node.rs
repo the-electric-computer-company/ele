@@ -1,9 +1,6 @@
 use api::{self, IntoProtobuf};
 use common::*;
-use env_logger;
 use grpc;
-use log::LevelFilter;
-use std::default;
 #[allow(unused_imports)]
 use svc::{self, Node as _Node};
 
@@ -39,6 +36,9 @@ impl svc::Node for Node {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use env_logger;
+  use log::LevelFilter;
+  use std::default;
 
   fn test_client() -> svc::NodeClient {
     let conf = grpc::ClientConf::new();
