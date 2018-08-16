@@ -22,7 +22,7 @@ fmt:
 	echo Checking for TODO/FIX/XXX...
 	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src 
 	echo Checking for lines over 100 columns...
-	! grep --color -Ern --exclude-dir=src/svc '.{101}' src
+	! rg --glob '!src/svc' '.{101}' src
 	echo Invoking clippy...
 	cargo +nightly clippy -- \
 		-D clippy \
@@ -68,10 +68,11 @@ run command='node': build
 install-dev-deps:
 	# for `lint` recipe
 	rustup component add clippy-preview --toolchain=nightly
+	cargo install ripgrep || true
 	# for `fmt` recipe
 	rustup component add rustfmt-preview
 	# for `watch` recipe
-	cargo install cargo-watch 
+	cargo install cargo-watch || true
 
 # install development dependencies using homebrew
 install-dev-deps-homebrew:
