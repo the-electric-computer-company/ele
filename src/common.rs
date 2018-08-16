@@ -1,8 +1,12 @@
 pub use std::{
+  default::Default,
   env,
   ffi::OsStr,
+  fmt::Debug,
   fs, io, net,
   path::{Path, PathBuf},
+  sync::Mutex,
+  thread,
 };
 
 pub use error::Error;

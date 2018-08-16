@@ -2,8 +2,6 @@
 extern crate log;
 #[macro_use]
 extern crate structopt;
-#[macro_use]
-extern crate failure;
 
 #[cfg(test)]
 extern crate assert_fs;
@@ -14,6 +12,7 @@ extern crate predicates;
 extern crate env_logger;
 extern crate grpc;
 extern crate protobuf;
+extern crate rand;
 extern crate rusqlite;
 extern crate sha2;
 extern crate tls_api;

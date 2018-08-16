@@ -6,7 +6,7 @@ const SQLITE_DATABASE_APPLICATION_ID: i32 = 0x1337_0000;
 
 #[derive(Debug)]
 pub struct Library {
-  connection: Connection,
+  connection: Mutex<Connection>,
   database_path: PathBuf,
 }
 
@@ -87,7 +87,7 @@ impl Library {
       })?;
 
     let library = Library {
-      connection,
+      connection: Mutex::new(connection),
       database_path,
     };
 
@@ -124,6 +124,8 @@ impl Library {
   fn execute(&self, statement: &str) -> Result<(), Error> {
     self
       .connection
+      .lock()
+      .expect("library connection lock poisoned")
       .execute(statement, &[])
       .embellish(self, statement)
       .map(|_| ())
@@ -136,6 +138,8 @@ impl Library {
 
     self
       .connection
+      .lock()
+      .expect("library connection lock poisoned")
       .query_row(statement, &[], get::<T>)
       .embellish(self, statement)
   }

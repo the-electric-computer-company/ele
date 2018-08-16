@@ -1,136 +1,193 @@
-use failure;
-use sha2::{Digest, Sha256};
-use std::iter;
+use common::*;
+use rand;
 use svc;
-use uuid::Uuid;
 
-#[derive(PartialEq, Debug)]
-struct Error {
-  code: u32,
-  message: String,
+const ERROR_PARSE: u32 = 1;
+
+pub trait FromProtobuf: Sized {
+  type Protobuf;
+  type Error: Debug;
+  fn from_protobuf(p: Self::Protobuf) -> Result<Self, Self::Error>;
+}
+
+pub trait ToProtobuf: Sized {
+  type Protobuf;
+  fn to_protobuf(self) -> Self::Protobuf;
+}
+
+pub trait RequiredFields {
+  fn required_fields() -> Self;
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct Error {
+  pub message: String,
+  pub kind: ErrorKind,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum ErrorKind {
+  Unknown { code: u32 },
+  Parse,
+}
+
+impl ErrorKind {
+  fn to_error(self, message: impl AsRef<str>) -> Error {
+    Error {
+      message: message.as_ref().to_string(),
+      kind: self,
+    }
+  }
 }
 
 impl Error {
-  fn from_protobuf(proto_error: &svc::Error) -> Result<Error, failure::Error> {
-    let code = proto_error.get_code();
-    let message = proto_error.get_message().to_string();
-    Ok(Error { code, message })
-  }
-
-  fn to_protobuf(&self) -> svc::Error {
-    let mut proto_error = svc::Error::new();
-    proto_error.set_code(self.code);
-    proto_error.set_message(self.message.clone());
-    proto_error
-  }
-}
-
-#[derive(PartialEq, Debug)]
-struct RequestId {
-  id: Uuid,
-}
-
-impl RequestId {
-  fn new() -> RequestId {
-    RequestId { id: Uuid::new_v4() }
-  }
-
-  fn from_protobuf(proto_req_id: &svc::RequestId) -> Result<RequestId, failure::Error> {
-    let vec = proto_req_id.get_request_id().to_vec();
-    Ok(RequestId {
-      id: Uuid::from_bytes(vec.as_slice())?,
-    })
-  }
-
-  fn to_protobuf(&self) -> svc::RequestId {
-    let buf = self.id.as_bytes().to_vec();
-    let mut protobuf_req_id = svc::RequestId::new();
-    protobuf_req_id.set_request_id(buf);
-    protobuf_req_id
-  }
-}
-
-#[derive(PartialEq, Debug)]
-struct Pubkey {
-  key: Vec<u8>,
-}
-
-impl Pubkey {
-  fn new() -> Pubkey {
-    let uuid = Uuid::new_v4();
-    Pubkey::from_bytes(uuid.as_bytes())
-  }
-
-  fn from_bytes<B: AsRef<[u8]>>(bytes: B) -> Pubkey {
-    Pubkey {
-      key: bytes.as_ref().to_vec(),
+  fn code(&self) -> u32 {
+    use self::ErrorKind::*;
+    match self.kind {
+      Unknown { code } => code,
+      Parse => ERROR_PARSE,
     }
   }
 
-  fn from_protobuf(proto_pubkey: &svc::Pubkey) -> Result<Pubkey, failure::Error> {
-    let vec = proto_pubkey.get_key().to_vec();
-    // make sure it's a valid uuid
-    let uuid = Uuid::from_bytes(vec.as_slice())?;
-    Ok(Pubkey::from_bytes(uuid.as_bytes()))
+  fn to_protobuf(self) -> svc::Error {
+    let mut proto_error = svc::Error::new();
+    proto_error.set_code(self.code());
+    proto_error.set_message(self.message);
+    proto_error
   }
 
-  fn to_protobuf(&self) -> svc::Pubkey {
+  fn from_protobuf(mut proto_error: svc::Error) -> Error {
+    let code = proto_error.get_code();
+    let message = proto_error.take_message();
+
+    use self::ErrorKind::*;
+    let kind = match code {
+      ERROR_PARSE => Parse,
+      _ => Unknown { code },
+    };
+    Error { message, kind }
+  }
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct Pubkey {
+  pub key: [u8; 16],
+}
+
+impl Pubkey {
+  pub fn new() -> Pubkey {
+    Pubkey {
+      key: rand::random(),
+    }
+  }
+}
+
+impl ToProtobuf for Pubkey {
+  type Protobuf = svc::Pubkey;
+  fn to_protobuf(self) -> svc::Pubkey {
     let mut proto_pubkey = svc::Pubkey::new();
-    proto_pubkey.set_key(self.key.clone());
+    proto_pubkey.set_key((&self.key[..]).to_vec());
     proto_pubkey
   }
 }
 
-#[derive(PartialEq, Debug)]
-struct NodeId {
+impl FromProtobuf for Pubkey {
+  type Protobuf = svc::Pubkey;
+  type Error = Error;
+
+  fn from_protobuf(proto_pubkey: Self::Protobuf) -> Result<Pubkey, Error> {
+    let bytes = proto_pubkey.get_key().to_vec();
+    if bytes.len() != 16 {
+      return Err(ErrorKind::Parse.to_error(format!("invalid pubkey length: {}", bytes.len())));
+    }
+    let mut pubkey = Pubkey { key: [0; 16] };
+    pubkey.key.copy_from_slice(bytes.as_slice());
+    Ok(pubkey)
+  }
+}
+
+impl RequiredFields for Pubkey {
+  fn required_fields() -> Pubkey {
+    Pubkey::new()
+  }
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct NodeId {
   node_pubkey: Pubkey,
 }
 
 impl NodeId {
-  fn new() -> NodeId {
+  pub fn new() -> NodeId {
     let node_pubkey = Pubkey::new();
     NodeId { node_pubkey }
   }
+}
 
-  fn from_protobuf(proto_node_id: &svc::NodeId) -> Result<NodeId, failure::Error> {
-    let node_pubkey = Pubkey::from_protobuf(proto_node_id.get_node_pubkey())?;
+impl FromProtobuf for NodeId {
+  type Protobuf = svc::NodeId;
+  type Error = Error;
+
+  fn from_protobuf(proto_node_id: svc::NodeId) -> Result<NodeId, Error> {
+    let mut proto_node_id = proto_node_id;
+    let node_pubkey = Pubkey::from_protobuf(proto_node_id.take_node_pubkey())?;
     Ok(NodeId { node_pubkey })
   }
+}
 
-  fn to_protobuf(&self) -> svc::NodeId {
+impl ToProtobuf for NodeId {
+  type Protobuf = svc::NodeId;
+
+  fn to_protobuf(self) -> svc::NodeId {
     let mut proto_node_id = svc::NodeId::new();
     proto_node_id.set_node_pubkey(self.node_pubkey.to_protobuf());
     proto_node_id
   }
 }
 
-#[derive(PartialEq, Debug)]
-struct CollectionId {
-  node_id: NodeId,
-  collection_pubkey: Pubkey,
+impl RequiredFields for NodeId {
+  fn required_fields() -> NodeId {
+    NodeId::new()
+  }
 }
 
+#[derive(PartialEq, Debug, Clone)]
+pub struct CollectionId {
+  pub node_id: NodeId,
+  pub collection_pubkey: Pubkey,
+}
+
+// TODO change proto to pb
+
 impl CollectionId {
-  fn new(node_id: NodeId) -> CollectionId {
+  pub fn new(node_id: NodeId) -> CollectionId {
     let collection_pubkey = Pubkey::new();
     CollectionId {
       node_id,
       collection_pubkey,
     }
   }
+}
 
-  fn from_protobuf(
-    proto_collection_id: &svc::CollectionId,
-  ) -> Result<CollectionId, failure::Error> {
-    let node_id = NodeId::from_protobuf(proto_collection_id.get_node_id())?;
-    let collection_pubkey = Pubkey::from_protobuf(proto_collection_id.get_collection_pubkey())?;
+impl FromProtobuf for CollectionId {
+  type Protobuf = svc::CollectionId;
+  type Error = Error;
+
+  fn from_protobuf(proto_collection_id: svc::CollectionId) -> Result<CollectionId, Error> {
+    let mut proto_collection_id = proto_collection_id;
+    let node_id = NodeId::from_protobuf(proto_collection_id.take_node_id())?;
+    let collection_pubkey = Pubkey::from_protobuf(proto_collection_id.take_collection_pubkey())?;
     Ok(CollectionId {
       node_id,
       collection_pubkey,
     })
   }
+}
 
-  fn to_protobuf(&self) -> svc::CollectionId {
+impl ToProtobuf for CollectionId {
+  type Protobuf = svc::CollectionId;
+
+  fn to_protobuf(self) -> svc::CollectionId {
     let mut proto_collection_id = svc::CollectionId::new();
     proto_collection_id.set_node_id(self.node_id.to_protobuf());
     proto_collection_id.set_collection_pubkey(self.collection_pubkey.to_protobuf());
@@ -138,130 +195,82 @@ impl CollectionId {
   }
 }
 
-#[derive(PartialEq, Debug)]
-struct BundleId {
-  collection_id: CollectionId,
-  bundle_id: Uuid,
-}
-
-impl BundleId {
-  fn new(collection_id: CollectionId) -> BundleId {
-    let bundle_id = Uuid::new_v4();
-    BundleId {
-      collection_id,
-      bundle_id,
-    }
-  }
-
-  fn from_protobuf(proto_bundle_id: &svc::BundleId) -> Result<BundleId, failure::Error> {
-    let collection_id = CollectionId::from_protobuf(proto_bundle_id.get_collection_id())?;
-    let bundle_id = Uuid::from_bytes(proto_bundle_id.get_bundle_id())?;
-    Ok(BundleId {
-      collection_id,
-      bundle_id,
-    })
-  }
-
-  fn to_protobuf(&self) -> svc::BundleId {
-    let mut bundle_id = svc::BundleId::new();
-    bundle_id.set_collection_id(self.collection_id.to_protobuf());
-    bundle_id.set_bundle_id(self.bundle_id.as_bytes().to_vec());
-    bundle_id
+impl RequiredFields for CollectionId {
+  fn required_fields() -> CollectionId {
+    let node_id = NodeId::required_fields();
+    CollectionId::new(node_id)
   }
 }
 
-#[derive(PartialEq, Debug)]
-struct Hash {
-  sha256: Vec<u8>,
+#[derive(PartialEq, Debug, Clone)]
+pub struct CollectionCreateRequest {
+  pub node_id: NodeId,
 }
 
-impl Hash {
-  fn sha256_digest(buf: &[u8]) -> Hash {
-    let mut hasher = Sha256::default();
-    hasher.input(buf);
-    let result = hasher.result();
-    Hash {
-      sha256: result.to_vec(),
-    }
-  }
+impl FromProtobuf for CollectionCreateRequest {
+  type Protobuf = svc::CollectionCreateRequest;
+  type Error = Error;
 
-  fn from_protobuf(hash: &svc::Hash) -> Result<Hash, failure::Error> {
-    let bytes = hash.get_hash();
-    if bytes.len() == 32 {
-      Ok(Hash {
-        sha256: bytes.to_vec(),
-      })
-    } else {
-      Err(format_err!(
-        "invalid sha256 hash input of length: {}",
-        bytes.len()
-      ))
-    }
-  }
-
-  fn to_protobuf(&self) -> svc::Hash {
-    let mut proto_hash = svc::Hash::new();
-    proto_hash.set_hash(self.sha256.clone());
-    proto_hash
-  }
-}
-
-#[derive(PartialEq, Debug)]
-struct CollectionCreateRequest {
-  request_id: RequestId,
-  node_id: NodeId,
-}
-
-impl CollectionCreateRequest {
   fn from_protobuf(
-    proto_req: &svc::CollectionCreateRequest,
-  ) -> Result<CollectionCreateRequest, failure::Error> {
-    let request_id = RequestId::from_protobuf(proto_req.get_request_id())?;
-    let node_id = NodeId::from_protobuf(proto_req.get_node_id())?;
-    Ok(CollectionCreateRequest {
-      request_id,
-      node_id,
-    })
+    proto_req: svc::CollectionCreateRequest,
+  ) -> Result<CollectionCreateRequest, Error> {
+    let mut proto_req = proto_req;
+    let node_id = NodeId::from_protobuf(proto_req.take_node_id())?;
+    Ok(CollectionCreateRequest { node_id })
   }
+}
 
-  fn to_protobuf(&self) -> svc::CollectionCreateRequest {
+impl ToProtobuf for CollectionCreateRequest {
+  type Protobuf = svc::CollectionCreateRequest;
+
+  fn to_protobuf(self) -> svc::CollectionCreateRequest {
     let mut proto_req = svc::CollectionCreateRequest::new();
-    proto_req.set_request_id(self.request_id.to_protobuf());
     proto_req.set_node_id(self.node_id.to_protobuf());
     proto_req
   }
 }
 
-#[derive(PartialEq, Debug)]
-struct CollectionCreateResponse {
-  request_id: RequestId,
-  error: Option<Error>,
-  collection_id: CollectionId,
+impl RequiredFields for CollectionCreateRequest {
+  fn required_fields() -> CollectionCreateRequest {
+    let node_id = NodeId::required_fields();
+    CollectionCreateRequest { node_id }
+  }
 }
 
-impl CollectionCreateResponse {
+#[derive(PartialEq, Debug, Clone)]
+pub struct CollectionCreateResponse {
+  pub error: Option<Error>,
+  pub collection_id: CollectionId,
+}
+
+impl FromProtobuf for CollectionCreateResponse {
+  type Protobuf = svc::CollectionCreateResponse;
+  type Error = Error;
+
   fn from_protobuf(
-    proto_resp: &svc::CollectionCreateResponse,
-  ) -> Result<CollectionCreateResponse, failure::Error> {
-    let request_id = RequestId::from_protobuf(proto_resp.get_request_id())?;
+    proto_resp: svc::CollectionCreateResponse,
+  ) -> Result<CollectionCreateResponse, Error> {
+    let mut proto_resp = proto_resp;
     let error = if proto_resp.has_error() {
-      Some(Error::from_protobuf(proto_resp.get_error())?)
+      Some(Error::from_protobuf(proto_resp.take_error()))
     } else {
       None
     };
 
-    let collection_id = CollectionId::from_protobuf(proto_resp.get_collection_id())?;
+    let collection_id = CollectionId::from_protobuf(proto_resp.take_collection_id())?;
     Ok(CollectionCreateResponse {
-      request_id,
       error,
       collection_id,
     })
   }
+}
 
-  fn to_protobuf(&self) -> svc::CollectionCreateResponse {
+impl ToProtobuf for CollectionCreateResponse {
+  type Protobuf = svc::CollectionCreateResponse;
+
+  fn to_protobuf(self) -> svc::CollectionCreateResponse {
     let mut proto_resp = svc::CollectionCreateResponse::new();
-    proto_resp.set_request_id(self.request_id.to_protobuf());
-    if let Some(ref error) = self.error {
+    if let Some(error) = self.error {
       proto_resp.set_error(error.to_protobuf());
     }
     proto_resp.set_collection_id(self.collection_id.to_protobuf());
@@ -269,149 +278,140 @@ impl CollectionCreateResponse {
   }
 }
 
+impl RequiredFields for CollectionCreateResponse {
+  fn required_fields() -> CollectionCreateResponse {
+    let collection_id = CollectionId::required_fields();
+    CollectionCreateResponse {
+      collection_id,
+      error: None,
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
 
+  fn test_required_fields<T: FromProtobuf<Protobuf = P> + Debug, P: Default>(
+    setters: &[fn(&mut P)],
+  ) {
+    for i in 0..setters.len() {
+      let mut victim = Default::default();
+      for (j, setter) in setters.iter().enumerate() {
+        if j == i {
+          continue;
+        }
+        setter(&mut victim);
+      }
+      T::from_protobuf(victim).expect_err("it worked");
+    }
+
+    let mut p = Default::default();
+    for setter in setters {
+      setter(&mut p)
+    }
+    T::from_protobuf(p).expect("parsing failed when all required fields were present");
+  }
+
+  fn test_round_trip<
+    T: RequiredFields
+      + FromProtobuf<Protobuf = P>
+      + ToProtobuf<Protobuf = P>
+      + Clone
+      + Debug
+      + PartialEq,
+    P,
+  >() {
+    let obj = T::required_fields();
+    let pb = obj.clone().to_protobuf();
+    let obj2 = T::from_protobuf(pb).unwrap();
+    assert_eq!(obj2, obj);
+  }
+
   #[test]
-  fn test_error() {
-    let first_error = Error {
-      code: 42,
-      message: "foo".to_string(),
-    };
-    let proto_err = first_error.to_protobuf();
-    let second_error = Error::from_protobuf(&proto_err).unwrap();
+  fn error() {
+    let first_error = ErrorKind::Parse.to_error("foo");
+    let proto_err = first_error.clone().to_protobuf();
+    let second_error = Error::from_protobuf(proto_err);
     assert_eq!(second_error, first_error);
   }
 
   #[test]
-  fn test_request_id() {
-    let first_req_id = RequestId::new();
-    let buf = first_req_id.id.as_bytes().to_vec();
-    let mut protobuf_req_id_out = first_req_id.to_protobuf();
-    assert_eq!(protobuf_req_id_out.take_request_id(), buf);
-
-    let mut protobuf_req_id_in = svc::RequestId::new();
-    protobuf_req_id_in.set_request_id(buf.clone());
-    let second_req_id = RequestId::from_protobuf(&protobuf_req_id_in).unwrap();
-    assert_eq!(second_req_id, first_req_id);
-
-    let mut bad_req_id = svc::RequestId::new();
-    let bad_uuid: Vec<u8> = vec![1, 2, 4];
-    bad_req_id.set_request_id(bad_uuid);
-    RequestId::from_protobuf(&bad_req_id).expect_err("bad uuid should have caused an error");
+  fn round_trips() {
+    test_round_trip::<Pubkey, svc::Pubkey>();
+    test_round_trip::<NodeId, svc::NodeId>();
+    test_round_trip::<CollectionId, svc::CollectionId>();
+    test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+    test_round_trip::<CollectionCreateResponse, svc::CollectionCreateResponse>();
   }
 
   #[test]
-  fn test_pubkey() {
-    let first_pubkey = Pubkey::new();
-    let proto_pubkey = first_pubkey.to_protobuf();
-    assert_eq!(proto_pubkey.get_key(), first_pubkey.key.as_slice());
+  fn pubkey_required_fields() {
+    test_required_fields::<Pubkey, svc::Pubkey>(&[|p| {
+      p.set_key(rand::random::<[u8; 16]>().iter().cloned().collect())
+    }])
+  }
 
-    let second_pubkey = Pubkey::from_protobuf(&proto_pubkey).unwrap();
-    assert_eq!(first_pubkey, second_pubkey);
-
+  #[test]
+  fn bad_pubkey() {
     let mut bad_pubkey = svc::Pubkey::new();
     let bad_uuid: Vec<u8> = vec![1, 2, 4];
     bad_pubkey.set_key(bad_uuid);
-    Pubkey::from_protobuf(&bad_pubkey).expect_err("bad uuid should have caused an error");
+    assert_eq!(
+      Pubkey::from_protobuf(bad_pubkey)
+        .expect_err("bad uuid should have caused an error")
+        .kind,
+      ErrorKind::Parse
+    )
   }
 
   #[test]
-  fn test_node_id() {
-    let first_node_id = NodeId::new();
-    let proto_node_id = first_node_id.to_protobuf();
-
-    let second_node_id = NodeId::from_protobuf(&proto_node_id).unwrap();
-    assert_eq!(second_node_id, first_node_id);
-
-    let proto_empty_node_id = svc::NodeId::new();
-    NodeId::from_protobuf(&proto_empty_node_id).expect_err("expected error from empty node id");
+  fn node_id_required_fields() {
+    test_required_fields::<NodeId, svc::NodeId>(&[|p| {
+      p.set_node_pubkey(Pubkey::new().to_protobuf())
+    }])
   }
 
   #[test]
-  fn test_collection_id() {
-    let first_node_id = NodeId::new();
-    let mut first_collection_id = CollectionId::new(first_node_id);
-    let proto_collection_id = first_collection_id.to_protobuf();
-    let second_collection_id = CollectionId::from_protobuf(&proto_collection_id).unwrap();
-    assert_eq!(second_collection_id, first_collection_id);
-
-    // sanity check to make sure sub-objects are also compared
-    let second_node_id = NodeId::new();
-    first_collection_id.node_id = second_node_id;
-    assert_ne!(second_collection_id, first_collection_id);
+  fn collection_id_required_fields() {
+    test_required_fields::<CollectionId, svc::CollectionId>(&[
+      |p| p.set_node_id(NodeId::required_fields().to_protobuf()),
+      |p| p.set_collection_pubkey(Pubkey::required_fields().to_protobuf()),
+    ])
   }
 
   #[test]
-  fn test_bundle_id() {
-    let first_node_id = NodeId::new();
-    let first_collection_id = CollectionId::new(first_node_id);
-    let first_bundle_id = BundleId::new(first_collection_id);
-
-    let proto_bundle_id = first_bundle_id.to_protobuf();
-    let second_bundle_id = BundleId::from_protobuf(&proto_bundle_id).unwrap();
-    assert_eq!(second_bundle_id, first_bundle_id);
-
-    let second_node_id = NodeId::new();
-    let second_collection_id = CollectionId::new(second_node_id);
-    let bad_bundle_id: Vec<u8> = iter::repeat(1).take(17).collect();
-    let mut proto_bad_bundle_id = svc::BundleId::new();
-    proto_bad_bundle_id.set_collection_id(second_collection_id.to_protobuf());
-    proto_bad_bundle_id.set_bundle_id(bad_bundle_id);
-    BundleId::from_protobuf(&proto_bad_bundle_id)
-      .expect_err("expected error from bundle id of invalid length");
+  fn collection_create_request_required_fields() {
+    test_required_fields::<CollectionCreateRequest, svc::CollectionCreateRequest>(&[|p| {
+      p.set_node_id(NodeId::required_fields().to_protobuf())
+    }])
   }
 
   #[test]
-  fn test_hash() {
-    let first_hash = Hash::sha256_digest(b"Hey kid, I'm a computa!");
-    let proto_hash = first_hash.to_protobuf();
-    let second_hash = Hash::from_protobuf(&proto_hash).unwrap();
-    assert_eq!(second_hash, first_hash);
-    let different_hash = Hash::sha256_digest(b"Stop all the downloadin'");
-    assert_ne!(different_hash, second_hash);
-
-    let bad_hash: Vec<u8> = iter::repeat(1).take(31).collect();
-    let mut proto_bad_hash = svc::Hash::new();
-    proto_bad_hash.set_hash(bad_hash);
-    Hash::from_protobuf(&proto_bad_hash)
-      .expect_err("expected error for a byte string of invalid length");
+  fn collection_create_response_required_fields() {
+    test_required_fields::<CollectionCreateResponse, svc::CollectionCreateResponse>(&[|p| {
+      p.set_collection_id(CollectionId::required_fields().to_protobuf())
+    }])
   }
 
-  #[test]
-  fn test_collection_create_request() {
-    let first_req_id = RequestId::new();
-    let first_node_id = NodeId::new();
-    let first_col_create_req = CollectionCreateRequest {
-      request_id: first_req_id,
-      node_id: first_node_id,
-    };
+  // #[test]
+  // fn test_collection_create_response() {
+  //   let first_req_id = RequestId::new();
+  //   let first_error = Error {
+  //     code: 42,
+  //     message: "foo".to_string(),
+  //   };
+  //   let first_node_id = NodeId::new();
+  //   let first_col_id = CollectionId::new(first_node_id);
 
-    let proto_col_create_req = first_col_create_req.to_protobuf();
-    let second_col_create_req =
-      CollectionCreateRequest::from_protobuf(&proto_col_create_req).unwrap();
-    assert_eq!(second_col_create_req, first_col_create_req);
-  }
+  //   let first_col_create_resp = CollectionCreateResponse {
+  //     request_id: first_req_id,
+  //     error: Some(first_error),
+  //     collection_id: first_col_id,
+  //   };
 
-  #[test]
-  fn test_collection_create_response() {
-    let first_req_id = RequestId::new();
-    let first_error = Error {
-      code: 42,
-      message: "foo".to_string(),
-    };
-    let first_node_id = NodeId::new();
-    let first_col_id = CollectionId::new(first_node_id);
-
-    let first_col_create_resp = CollectionCreateResponse {
-      request_id: first_req_id,
-      error: Some(first_error),
-      collection_id: first_col_id,
-    };
-
-    let proto_resp = first_col_create_resp.to_protobuf();
-    let second_col_create_resp = CollectionCreateResponse::from_protobuf(&proto_resp).unwrap();
-    assert_eq!(second_col_create_resp, first_col_create_resp);
-  }
+  //   let proto_resp = first_col_create_resp.to_protobuf();
+  //   let second_col_create_resp = CollectionCreateResponse::from_protobuf(&proto_resp).unwrap();
+  //   assert_eq!(second_col_create_resp, first_col_create_resp);
+  // }
 }

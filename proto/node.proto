@@ -22,9 +22,9 @@ message Error {
   string message = 2;
 }
 
-message RequestId {
-  bytes request_id = 1;
-}
+// message RequestId {
+//   bytes request_id = 1;
+// }
 
 message Pubkey {
   bytes key = 1;
@@ -39,14 +39,14 @@ message CollectionId {
  Pubkey collection_pubkey = 2;
 }
 
-message BundleId {
- CollectionId collection_id = 1;
- bytes bundle_id = 2;
-}
+// message BundleId {
+//  CollectionId collection_id = 1;
+//  bytes bundle_id = 2;
+// }
 
-message Hash {
- bytes hash = 1;
-}
+// message Hash {
+//  bytes hash = 1;
+// }
 
 // message ArchiveStreamRequest {
 //   RequestId request_id = 1;
@@ -73,12 +73,10 @@ message Hash {
 // }
 
 message CollectionCreateRequest {
-  RequestId request_id = 1;
   NodeId node_id = 2;
 }
 
 message CollectionCreateResponse {
-  RequestId request_id = 1;
   Error error = 2;
   CollectionId collection_id = 3;
 }
