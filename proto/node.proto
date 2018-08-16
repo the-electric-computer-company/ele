@@ -35,7 +35,6 @@ message NodeId {
 }
 
 message CollectionId {
- NodeId node_id= 1;
  Pubkey collection_pubkey = 2;
 }
 

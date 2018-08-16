@@ -1,4 +1,4 @@
-use api::{self, FromProtobuf, IntoProtobuf};
+use api::{self, IntoProtobuf};
 use common::*;
 use env_logger;
 use grpc;
@@ -25,12 +25,11 @@ impl svc::Node for Node {
   fn collection_create(
     &self,
     _o: ::grpc::RequestOptions,
-    proto_create_req: svc::CollectionCreateRequest,
+    _pb_create_req: svc::CollectionCreateRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionCreateResponse> {
-    let create_req = api::CollectionCreateRequest::from_protobuf(proto_create_req).unwrap();
     let create_resp = api::CollectionCreateResponse {
       error: None,
-      collection_id: api::CollectionId::new(create_req.node_id),
+      collection_id: api::CollectionId::new(),
     };
 
     grpc::SingleResponse::completed(create_resp.into_protobuf())

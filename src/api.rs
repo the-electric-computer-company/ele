@@ -153,17 +153,13 @@ impl RequiredFields for NodeId {
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CollectionId {
-  pub node_id: NodeId,
   pub collection_pubkey: Pubkey,
 }
 
 impl CollectionId {
-  pub fn new(node_id: NodeId) -> CollectionId {
+  pub fn new() -> CollectionId {
     let collection_pubkey = Pubkey::new();
-    CollectionId {
-      node_id,
-      collection_pubkey,
-    }
+    CollectionId { collection_pubkey }
   }
 }
 
@@ -173,12 +169,8 @@ impl FromProtobuf for CollectionId {
 
   fn from_protobuf(pb_collection_id: svc::CollectionId) -> Result<CollectionId, Error> {
     let mut pb_collection_id = pb_collection_id;
-    let node_id = NodeId::from_protobuf(pb_collection_id.take_node_id())?;
     let collection_pubkey = Pubkey::from_protobuf(pb_collection_id.take_collection_pubkey())?;
-    Ok(CollectionId {
-      node_id,
-      collection_pubkey,
-    })
+    Ok(CollectionId { collection_pubkey })
   }
 }
 
@@ -187,7 +179,6 @@ impl IntoProtobuf for CollectionId {
 
   fn into_protobuf(self) -> svc::CollectionId {
     let mut pb_collection_id = svc::CollectionId::new();
-    pb_collection_id.set_node_id(self.node_id.into_protobuf());
     pb_collection_id.set_collection_pubkey(self.collection_pubkey.into_protobuf());
     pb_collection_id
   }
@@ -195,8 +186,7 @@ impl IntoProtobuf for CollectionId {
 
 impl RequiredFields for CollectionId {
   fn required_fields() -> CollectionId {
-    let node_id = NodeId::required_fields();
-    CollectionId::new(node_id)
+    CollectionId::new()
   }
 }
 
@@ -370,10 +360,9 @@ mod tests {
 
   #[test]
   fn collection_id_required_fields() {
-    test_required_fields::<CollectionId, svc::CollectionId>(&[
-      |p| p.set_node_id(NodeId::required_fields().into_protobuf()),
-      |p| p.set_collection_pubkey(Pubkey::required_fields().into_protobuf()),
-    ])
+    test_required_fields::<CollectionId, svc::CollectionId>(&[|p| {
+      p.set_collection_pubkey(Pubkey::required_fields().into_protobuf())
+    }])
   }
 
   #[test]
