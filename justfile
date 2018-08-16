@@ -62,6 +62,13 @@ pr: fmt lint test assert-clean
 	[ `git rev-parse --abbrev-ref HEAD` != master ]
 	git push origin
 
+# delete merged BRANCH
+done BRANCH: assert-clean
+	git checkout master
+	git pull --rebase origin master
+	git diff --no-ext-diff --quiet --exit-code {{BRANCH}}
+	git branch -D {{BRANCH}}
+
 # run a command, defaulting to `node`
 run command='node': build
 	RUST_LOG={{log}} ./target/debug/ele {{command}}
