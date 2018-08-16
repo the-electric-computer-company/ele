@@ -99,7 +99,6 @@ configure-nodiff-driver:
 # create a release tag and push it to github
 tag: fmt lint test assert-clean
 	[ `git rev-parse --abbrev-ref HEAD` == release-{{version}} ]
-	git diff --no-ext-diff --quiet --exit-code master
 	cargo test --release
 	git tag -a {{version}} -m 'Release {{version}}'
 	git push origin release-{{version}}
@@ -111,4 +110,3 @@ publish: fmt lint test assert-clean
 	git fetch
 	git checkout {{version}}
 	cargo publish
-
