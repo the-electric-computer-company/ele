@@ -10,9 +10,9 @@ pub trait FromProtobuf: Sized {
   fn from_protobuf(p: Self::Protobuf) -> Result<Self, Self::Error>;
 }
 
-pub trait ToProtobuf: Sized {
+pub trait IntoProtobuf: Sized {
   type Protobuf;
-  fn to_protobuf(self) -> Self::Protobuf;
+  fn into_protobuf(self) -> Self::Protobuf;
 }
 
 pub trait RequiredFields {
@@ -32,7 +32,7 @@ pub enum ErrorKind {
 }
 
 impl ErrorKind {
-  fn to_error(self, message: impl AsRef<str>) -> Error {
+  fn into_error(self, message: impl AsRef<str>) -> Error {
     Error {
       message: message.as_ref().to_string(),
       kind: self,
@@ -49,7 +49,7 @@ impl Error {
     }
   }
 
-  fn to_protobuf(self) -> svc::Error {
+  fn into_protobuf(self) -> svc::Error {
     let mut pb_error = svc::Error::new();
     pb_error.set_code(self.code());
     pb_error.set_message(self.message);
@@ -82,9 +82,9 @@ impl Pubkey {
   }
 }
 
-impl ToProtobuf for Pubkey {
+impl IntoProtobuf for Pubkey {
   type Protobuf = svc::Pubkey;
-  fn to_protobuf(self) -> svc::Pubkey {
+  fn into_protobuf(self) -> svc::Pubkey {
     let mut pb_pubkey = svc::Pubkey::new();
     pb_pubkey.set_key((&self.key[..]).to_vec());
     pb_pubkey
@@ -98,7 +98,7 @@ impl FromProtobuf for Pubkey {
   fn from_protobuf(pb_pubkey: Self::Protobuf) -> Result<Pubkey, Error> {
     let bytes = pb_pubkey.get_key().to_vec();
     if bytes.len() != 16 {
-      return Err(ErrorKind::Parse.to_error(format!("invalid pubkey length: {}", bytes.len())));
+      return Err(ErrorKind::Parse.into_error(format!("invalid pubkey length: {}", bytes.len())));
     }
     let mut pubkey = Pubkey { key: [0; 16] };
     pubkey.key.copy_from_slice(bytes.as_slice());
@@ -135,12 +135,12 @@ impl FromProtobuf for NodeId {
   }
 }
 
-impl ToProtobuf for NodeId {
+impl IntoProtobuf for NodeId {
   type Protobuf = svc::NodeId;
 
-  fn to_protobuf(self) -> svc::NodeId {
+  fn into_protobuf(self) -> svc::NodeId {
     let mut pb_node_id = svc::NodeId::new();
-    pb_node_id.set_node_pubkey(self.node_pubkey.to_protobuf());
+    pb_node_id.set_node_pubkey(self.node_pubkey.into_protobuf());
     pb_node_id
   }
 }
@@ -182,13 +182,13 @@ impl FromProtobuf for CollectionId {
   }
 }
 
-impl ToProtobuf for CollectionId {
+impl IntoProtobuf for CollectionId {
   type Protobuf = svc::CollectionId;
 
-  fn to_protobuf(self) -> svc::CollectionId {
+  fn into_protobuf(self) -> svc::CollectionId {
     let mut pb_collection_id = svc::CollectionId::new();
-    pb_collection_id.set_node_id(self.node_id.to_protobuf());
-    pb_collection_id.set_collection_pubkey(self.collection_pubkey.to_protobuf());
+    pb_collection_id.set_node_id(self.node_id.into_protobuf());
+    pb_collection_id.set_collection_pubkey(self.collection_pubkey.into_protobuf());
     pb_collection_id
   }
 }
@@ -216,12 +216,12 @@ impl FromProtobuf for CollectionCreateRequest {
   }
 }
 
-impl ToProtobuf for CollectionCreateRequest {
+impl IntoProtobuf for CollectionCreateRequest {
   type Protobuf = svc::CollectionCreateRequest;
 
-  fn to_protobuf(self) -> svc::CollectionCreateRequest {
+  fn into_protobuf(self) -> svc::CollectionCreateRequest {
     let mut pb_req = svc::CollectionCreateRequest::new();
-    pb_req.set_node_id(self.node_id.to_protobuf());
+    pb_req.set_node_id(self.node_id.into_protobuf());
     pb_req
   }
 }
@@ -261,15 +261,15 @@ impl FromProtobuf for CollectionCreateResponse {
   }
 }
 
-impl ToProtobuf for CollectionCreateResponse {
+impl IntoProtobuf for CollectionCreateResponse {
   type Protobuf = svc::CollectionCreateResponse;
 
-  fn to_protobuf(self) -> svc::CollectionCreateResponse {
+  fn into_protobuf(self) -> svc::CollectionCreateResponse {
     let mut pb_resp = svc::CollectionCreateResponse::new();
     if let Some(error) = self.error {
-      pb_resp.set_error(error.to_protobuf());
+      pb_resp.set_error(error.into_protobuf());
     }
-    pb_resp.set_collection_id(self.collection_id.to_protobuf());
+    pb_resp.set_collection_id(self.collection_id.into_protobuf());
     pb_resp
   }
 }
@@ -312,22 +312,22 @@ mod tests {
   fn test_round_trip<
     T: RequiredFields
       + FromProtobuf<Protobuf = P>
-      + ToProtobuf<Protobuf = P>
+      + IntoProtobuf<Protobuf = P>
       + Clone
       + Debug
       + PartialEq,
     P,
   >() {
     let obj = T::required_fields();
-    let pb = obj.clone().to_protobuf();
+    let pb = obj.clone().into_protobuf();
     let obj2 = T::from_protobuf(pb).unwrap();
     assert_eq!(obj2, obj);
   }
 
   #[test]
   fn error() {
-    let first_error = ErrorKind::Parse.to_error("foo");
-    let pb_err = first_error.clone().to_protobuf();
+    let first_error = ErrorKind::Parse.into_error("foo");
+    let pb_err = first_error.clone().into_protobuf();
     let second_error = Error::from_protobuf(pb_err);
     assert_eq!(second_error, first_error);
   }
@@ -364,29 +364,29 @@ mod tests {
   #[test]
   fn node_id_required_fields() {
     test_required_fields::<NodeId, svc::NodeId>(&[|p| {
-      p.set_node_pubkey(Pubkey::new().to_protobuf())
+      p.set_node_pubkey(Pubkey::new().into_protobuf())
     }])
   }
 
   #[test]
   fn collection_id_required_fields() {
     test_required_fields::<CollectionId, svc::CollectionId>(&[
-      |p| p.set_node_id(NodeId::required_fields().to_protobuf()),
-      |p| p.set_collection_pubkey(Pubkey::required_fields().to_protobuf()),
+      |p| p.set_node_id(NodeId::required_fields().into_protobuf()),
+      |p| p.set_collection_pubkey(Pubkey::required_fields().into_protobuf()),
     ])
   }
 
   #[test]
   fn collection_create_request_required_fields() {
     test_required_fields::<CollectionCreateRequest, svc::CollectionCreateRequest>(&[|p| {
-      p.set_node_id(NodeId::required_fields().to_protobuf())
+      p.set_node_id(NodeId::required_fields().into_protobuf())
     }])
   }
 
   #[test]
   fn collection_create_response_required_fields() {
     test_required_fields::<CollectionCreateResponse, svc::CollectionCreateResponse>(&[|p| {
-      p.set_collection_id(CollectionId::required_fields().to_protobuf())
+      p.set_collection_id(CollectionId::required_fields().into_protobuf())
     }])
   }
 }

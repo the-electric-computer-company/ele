@@ -1,4 +1,4 @@
-use api::{self, FromProtobuf, ToProtobuf};
+use api::{self, FromProtobuf, IntoProtobuf};
 use common::*;
 use env_logger;
 use grpc;
@@ -33,7 +33,7 @@ impl svc::Node for Node {
       collection_id: api::CollectionId::new(create_req.node_id),
     };
 
-    grpc::SingleResponse::completed(create_resp.to_protobuf())
+    grpc::SingleResponse::completed(create_resp.into_protobuf())
   }
 }
 
@@ -72,7 +72,7 @@ mod tests {
     };
 
     let (_, resp, _) = client
-      .collection_create(default::Default::default(), create_req.to_protobuf())
+      .collection_create(default::Default::default(), create_req.into_protobuf())
       .wait()
       .unwrap();
 
