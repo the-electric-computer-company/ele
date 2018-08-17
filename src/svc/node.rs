@@ -385,7 +385,7 @@ impl ::protobuf::reflect::ProtobufValue for Pubkey {
 #[derive(PartialEq,Clone,Default)]
 pub struct NodeId {
     // message fields
-    pub node_pubkey: ::protobuf::SingularPtrField<Pubkey>,
+    pub pubkey: ::protobuf::SingularPtrField<Pubkey>,
     // special fields
     unknown_fields: ::protobuf::UnknownFields,
     cached_size: ::protobuf::CachedSize,
@@ -396,43 +396,43 @@ impl NodeId {
         ::std::default::Default::default()
     }
 
-    // .Pubkey node_pubkey = 1;
+    // .Pubkey pubkey = 1;
 
-    pub fn clear_node_pubkey(&mut self) {
-        self.node_pubkey.clear();
+    pub fn clear_pubkey(&mut self) {
+        self.pubkey.clear();
     }
 
-    pub fn has_node_pubkey(&self) -> bool {
-        self.node_pubkey.is_some()
+    pub fn has_pubkey(&self) -> bool {
+        self.pubkey.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_node_pubkey(&mut self, v: Pubkey) {
-        self.node_pubkey = ::protobuf::SingularPtrField::some(v);
+    pub fn set_pubkey(&mut self, v: Pubkey) {
+        self.pubkey = ::protobuf::SingularPtrField::some(v);
     }
 
     // Mutable pointer to the field.
     // If field is not initialized, it is initialized with default value first.
-    pub fn mut_node_pubkey(&mut self) -> &mut Pubkey {
-        if self.node_pubkey.is_none() {
-            self.node_pubkey.set_default();
+    pub fn mut_pubkey(&mut self) -> &mut Pubkey {
+        if self.pubkey.is_none() {
+            self.pubkey.set_default();
         }
-        self.node_pubkey.as_mut().unwrap()
+        self.pubkey.as_mut().unwrap()
     }
 
     // Take field
-    pub fn take_node_pubkey(&mut self) -> Pubkey {
-        self.node_pubkey.take().unwrap_or_else(|| Pubkey::new())
+    pub fn take_pubkey(&mut self) -> Pubkey {
+        self.pubkey.take().unwrap_or_else(|| Pubkey::new())
     }
 
-    pub fn get_node_pubkey(&self) -> &Pubkey {
-        self.node_pubkey.as_ref().unwrap_or_else(|| Pubkey::default_instance())
+    pub fn get_pubkey(&self) -> &Pubkey {
+        self.pubkey.as_ref().unwrap_or_else(|| Pubkey::default_instance())
     }
 }
 
 impl ::protobuf::Message for NodeId {
     fn is_initialized(&self) -> bool {
-        for v in &self.node_pubkey {
+        for v in &self.pubkey {
             if !v.is_initialized() {
                 return false;
             }
@@ -445,7 +445,7 @@ impl ::protobuf::Message for NodeId {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.node_pubkey)?;
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.pubkey)?;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -459,7 +459,7 @@ impl ::protobuf::Message for NodeId {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        if let Some(ref v) = self.node_pubkey.as_ref() {
+        if let Some(ref v) = self.pubkey.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
@@ -469,7 +469,7 @@ impl ::protobuf::Message for NodeId {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
-        if let Some(ref v) = self.node_pubkey.as_ref() {
+        if let Some(ref v) = self.pubkey.as_ref() {
             os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
@@ -517,9 +517,9 @@ impl ::protobuf::Message for NodeId {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
                 fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Pubkey>>(
-                    "node_pubkey",
-                    |m: &NodeId| { &m.node_pubkey },
-                    |m: &mut NodeId| { &mut m.node_pubkey },
+                    "pubkey",
+                    |m: &NodeId| { &m.pubkey },
+                    |m: &mut NodeId| { &mut m.pubkey },
                 ));
                 ::protobuf::reflect::MessageDescriptor::new::<NodeId>(
                     "NodeId",
@@ -543,7 +543,7 @@ impl ::protobuf::Message for NodeId {
 
 impl ::protobuf::Clear for NodeId {
     fn clear(&mut self) {
-        self.clear_node_pubkey();
+        self.clear_pubkey();
         self.unknown_fields.clear();
     }
 }
@@ -563,7 +563,7 @@ impl ::protobuf::reflect::ProtobufValue for NodeId {
 #[derive(PartialEq,Clone,Default)]
 pub struct CollectionId {
     // message fields
-    pub collection_pubkey: ::protobuf::SingularPtrField<Pubkey>,
+    pub pubkey: ::protobuf::SingularPtrField<Pubkey>,
     // special fields
     unknown_fields: ::protobuf::UnknownFields,
     cached_size: ::protobuf::CachedSize,
@@ -574,43 +574,43 @@ impl CollectionId {
         ::std::default::Default::default()
     }
 
-    // .Pubkey collection_pubkey = 2;
+    // .Pubkey pubkey = 2;
 
-    pub fn clear_collection_pubkey(&mut self) {
-        self.collection_pubkey.clear();
+    pub fn clear_pubkey(&mut self) {
+        self.pubkey.clear();
     }
 
-    pub fn has_collection_pubkey(&self) -> bool {
-        self.collection_pubkey.is_some()
+    pub fn has_pubkey(&self) -> bool {
+        self.pubkey.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_collection_pubkey(&mut self, v: Pubkey) {
-        self.collection_pubkey = ::protobuf::SingularPtrField::some(v);
+    pub fn set_pubkey(&mut self, v: Pubkey) {
+        self.pubkey = ::protobuf::SingularPtrField::some(v);
     }
 
     // Mutable pointer to the field.
     // If field is not initialized, it is initialized with default value first.
-    pub fn mut_collection_pubkey(&mut self) -> &mut Pubkey {
-        if self.collection_pubkey.is_none() {
-            self.collection_pubkey.set_default();
+    pub fn mut_pubkey(&mut self) -> &mut Pubkey {
+        if self.pubkey.is_none() {
+            self.pubkey.set_default();
         }
-        self.collection_pubkey.as_mut().unwrap()
+        self.pubkey.as_mut().unwrap()
     }
 
     // Take field
-    pub fn take_collection_pubkey(&mut self) -> Pubkey {
-        self.collection_pubkey.take().unwrap_or_else(|| Pubkey::new())
+    pub fn take_pubkey(&mut self) -> Pubkey {
+        self.pubkey.take().unwrap_or_else(|| Pubkey::new())
     }
 
-    pub fn get_collection_pubkey(&self) -> &Pubkey {
-        self.collection_pubkey.as_ref().unwrap_or_else(|| Pubkey::default_instance())
+    pub fn get_pubkey(&self) -> &Pubkey {
+        self.pubkey.as_ref().unwrap_or_else(|| Pubkey::default_instance())
     }
 }
 
 impl ::protobuf::Message for CollectionId {
     fn is_initialized(&self) -> bool {
-        for v in &self.collection_pubkey {
+        for v in &self.pubkey {
             if !v.is_initialized() {
                 return false;
             }
@@ -623,7 +623,7 @@ impl ::protobuf::Message for CollectionId {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 2 => {
-                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.collection_pubkey)?;
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.pubkey)?;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -637,7 +637,7 @@ impl ::protobuf::Message for CollectionId {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        if let Some(ref v) = self.collection_pubkey.as_ref() {
+        if let Some(ref v) = self.pubkey.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
@@ -647,7 +647,7 @@ impl ::protobuf::Message for CollectionId {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
-        if let Some(ref v) = self.collection_pubkey.as_ref() {
+        if let Some(ref v) = self.pubkey.as_ref() {
             os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
@@ -695,9 +695,9 @@ impl ::protobuf::Message for CollectionId {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
                 fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Pubkey>>(
-                    "collection_pubkey",
-                    |m: &CollectionId| { &m.collection_pubkey },
-                    |m: &mut CollectionId| { &mut m.collection_pubkey },
+                    "pubkey",
+                    |m: &CollectionId| { &m.pubkey },
+                    |m: &mut CollectionId| { &mut m.pubkey },
                 ));
                 ::protobuf::reflect::MessageDescriptor::new::<CollectionId>(
                     "CollectionId",
@@ -721,7 +721,7 @@ impl ::protobuf::Message for CollectionId {
 
 impl ::protobuf::Clear for CollectionId {
     fn clear(&mut self) {
-        self.clear_collection_pubkey();
+        self.clear_pubkey();
         self.unknown_fields.clear();
     }
 }
@@ -1154,15 +1154,15 @@ impl ::protobuf::reflect::ProtobufValue for CollectionCreateResponse {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\nnode.proto\"5\n\x05Error\x12\x12\n\x04code\x18\x01\x20\x01(\rR\x04co\
     de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x1a\n\x06Pubkey\
-    \x12\x10\n\x03key\x18\x01\x20\x01(\x0cR\x03key\"2\n\x06NodeId\x12(\n\x0b\
-    node_pubkey\x18\x01\x20\x01(\x0b2\x07.PubkeyR\nnodePubkey\"D\n\x0cCollec\
-    tionId\x124\n\x11collection_pubkey\x18\x02\x20\x01(\x0b2\x07.PubkeyR\x10\
-    collectionPubkey\";\n\x17CollectionCreateRequest\x12\x20\n\x07node_id\
-    \x18\x01\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"l\n\x18CollectionCreateRes\
-    ponse\x12\x1c\n\x05error\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x122\
-    \n\rcollection_id\x18\x02\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId2\
-    Q\n\x04Node\x12I\n\x10CollectionCreate\x12\x18.CollectionCreateRequest\
-    \x1a\x19.CollectionCreateResponse\"\0b\x06proto3\
+    \x12\x10\n\x03key\x18\x01\x20\x01(\x0cR\x03key\")\n\x06NodeId\x12\x1f\n\
+    \x06pubkey\x18\x01\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\"/\n\x0cCollectio\
+    nId\x12\x1f\n\x06pubkey\x18\x02\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\";\n\
+    \x17CollectionCreateRequest\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\
+    \x07.NodeIdR\x06nodeId\"l\n\x18CollectionCreateResponse\x12\x1c\n\x05err\
+    or\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x122\n\rcollection_id\x18\
+    \x02\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId2Q\n\x04Node\x12I\n\
+    \x10CollectionCreate\x12\x18.CollectionCreateRequest\x1a\x19.CollectionC\
+    reateResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

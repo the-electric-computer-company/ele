@@ -31,11 +31,11 @@ message Pubkey {
 }
 
 message NodeId {
-  Pubkey node_pubkey = 1;
+  Pubkey pubkey = 1;
 }
 
 message CollectionId {
-  Pubkey collection_pubkey = 2;
+  Pubkey pubkey = 2;
 }
 
 // message BundleId {

@@ -12,6 +12,7 @@ pub use std::{
 pub use rand::random;
 
 pub use api::{self, NodeId};
+pub use api::{FromProtobuf, IntoProtobuf};
 pub use error::Error;
 pub use library::Library;
 pub use node::Node;

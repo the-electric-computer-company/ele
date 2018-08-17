@@ -109,7 +109,7 @@ impl Library {
     self.set_journal_mode()?;
     self.initialize_settings()?;
 
-    // library.create_collections_table()?;
+    self.create_collections_table()?;
     // library.create_tables()?;
     Ok(())
   }
@@ -141,6 +141,7 @@ impl Library {
   }
 
   fn initialize_settings(&self) -> Result<(), Error> {
+    // TODO should node_id be node_pubkey instead?
     self.execute("CREATE TABLE settings (node_id BLOB NOT NULL);")?;
 
     let node_id = api::NodeId::from_pubkey(random());
@@ -157,6 +158,42 @@ impl Library {
     Pubkey::from_slice(&blob)
       .map_err(|pubkey_error| Error::LibraryStoredNodeId { pubkey_error })
       .map(NodeId::from_pubkey)
+  }
+
+  fn create_collections_table(&self) -> Result<(), Error> {
+    self.execute("CREATE TABLE collections (collection_pubkey BLOB NOT NULL);")?;
+    Ok(())
+  }
+
+  pub fn collection_create(&self) -> Result<api::CollectionId, Error> {
+    let pubkey: Pubkey = random();
+    let collection_id = api::CollectionId::from_pubkey(pubkey);
+    let blob: &[u8] = &collection_id.key().bytes;
+    self.call(
+      "INSERT INTO collections (collection_pubkey) VALUES (?1)",
+      &[&blob],
+    )?;
+    self.collection_get(pubkey)
+  }
+
+  fn collection_get(&self, pubkey: Pubkey) -> Result<api::CollectionId, Error> {
+    fn get(row: &Row) -> Vec<u8> {
+      row.get(0)
+    }
+
+    let statement = "SELECT collection_pubkey FROM collections WHERE collection_pubkey = ?1";
+    let query_blob: &[u8] = &pubkey.bytes[..];
+
+    let blob = self
+      .connection
+      .lock()
+      .expect("library connection lock poisoned")
+      .query_row(statement, &[&query_blob], get)
+      .embellish(self, statement)?;
+
+    Pubkey::from_slice(&blob)
+      .map_err(|pubkey_error| Error::LibraryStoredNodeId { pubkey_error })
+      .map(api::CollectionId::from_pubkey)
   }
 
   fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {

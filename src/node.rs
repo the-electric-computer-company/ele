@@ -4,12 +4,12 @@ use grpc;
 use svc::{self, Node as _Node};
 
 pub struct Node {
-  _library: Library,
+  library: Library,
 }
 
 impl Node {
   pub fn new(library: Library) -> Node {
-    Node { _library: library }
+    Node { library }
   }
 
   pub fn run(self) -> Result<(), Error> {
@@ -21,25 +21,24 @@ impl svc::Node for Node {
   fn collection_create(
     &self,
     _o: ::grpc::RequestOptions,
-    _pb_create_req: svc::CollectionCreateRequest,
+    pb_create_req: svc::CollectionCreateRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionCreateResponse> {
-    unimplemented!();
+    let create_req = api::CollectionCreateRequest::from_protobuf(pb_create_req).unwrap();
 
-    // let create_resp = api::CollectionCreateResponse {
-    //   error: None,
-    //   collection_id: api::CollectionId::new(),
-    // };
+    let collection_id = self.library.collection_create().unwrap();
 
-    // grpc::SingleResponse::completed(create_resp.into_protobuf())
+    let create_resp = api::CollectionCreateResponse {
+      error: None,
+      collection_id,
+    };
+
+    grpc::SingleResponse::completed(create_resp.into_protobuf())
   }
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
-  // use env_logger;
-  // use log::LevelFilter;
-
   fn test_client() -> svc::NodeClient {
     let conf = grpc::ClientConf::new();
     svc::NodeClient::new_plain("127.0.0.1", 2018, conf).unwrap()
@@ -70,17 +69,18 @@ mod tests {
     test_init();
 
     let _server = test_server();
-    let _client = test_client();
+    let client = test_client();
 
-    // let create_req = api::CollectionCreateRequest {
-    //   node_id: api::NodeId::new(),
-    // };
+    let create_req = api::CollectionCreateRequest {
+      node_id: NodeId::from_pubkey(random()),
+    };
 
-    // let (_, resp, _) = client
-    //   .collection_create(default::Default::default(), create_req.into_protobuf())
-    //   .wait()
-    //   .unwrap();
+    let (_, resp, _) = client
+      .collection_create(Default::default(), create_req.into_protobuf())
+      .wait()
+      .unwrap();
 
-    // println!("resp: {:?}", resp);
+    let create_resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
+    assert_eq!(create_resp.error, None);
   }
 }

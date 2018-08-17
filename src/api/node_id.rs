@@ -21,7 +21,7 @@ impl FromProtobuf for NodeId {
 
   fn from_protobuf(pb_node_id: svc::NodeId) -> Result<NodeId, Error> {
     let mut pb_node_id = pb_node_id;
-    let pubkey = Pubkey::from_protobuf(pb_node_id.take_node_pubkey())?;
+    let pubkey = Pubkey::from_protobuf(pb_node_id.take_pubkey())?;
     Ok(NodeId { pubkey })
   }
 }
@@ -31,7 +31,7 @@ impl IntoProtobuf for NodeId {
 
   fn into_protobuf(self) -> svc::NodeId {
     let mut pb_node_id = svc::NodeId::new();
-    pb_node_id.set_node_pubkey(self.key().into_protobuf());
+    pb_node_id.set_pubkey(self.key().into_protobuf());
     pb_node_id
   }
 }
@@ -53,7 +53,7 @@ mod tests {
   #[test]
   fn node_id_required_fields() {
     test_required_fields::<NodeId, svc::NodeId>(&[|p| {
-      p.set_node_pubkey(random::<Pubkey>().into_protobuf())
+      p.set_pubkey(random::<Pubkey>().into_protobuf())
     }])
   }
 }
