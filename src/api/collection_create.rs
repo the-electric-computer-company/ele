@@ -28,8 +28,7 @@ impl IntoProtobuf for CollectionCreateRequest {
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CollectionCreateResponse {
-  pub error: Option<Error>,
-  pub collection_id: CollectionId,
+  pub result: Result<CollectionId, Error>,
 }
 
 impl FromProtobuf for CollectionCreateResponse {
@@ -40,17 +39,13 @@ impl FromProtobuf for CollectionCreateResponse {
     pb_resp: svc::CollectionCreateResponse,
   ) -> Result<CollectionCreateResponse, Error> {
     let mut pb_resp = pb_resp;
-    let error = if pb_resp.has_error() {
-      Some(Error::from_protobuf(pb_resp.take_error()))
+    let result = if pb_resp.has_error() {
+      Err(Error::from_protobuf(pb_resp.take_error()))
     } else {
-      None
+      Ok(CollectionId::from_protobuf(pb_resp.take_collection_id())?)
     };
 
-    let collection_id = CollectionId::from_protobuf(pb_resp.take_collection_id())?;
-    Ok(CollectionCreateResponse {
-      error,
-      collection_id,
-    })
+    Ok(CollectionCreateResponse { result })
   }
 }
 
@@ -59,10 +54,10 @@ impl IntoProtobuf for CollectionCreateResponse {
 
   fn into_protobuf(self) -> svc::CollectionCreateResponse {
     let mut pb_resp = svc::CollectionCreateResponse::new();
-    if let Some(error) = self.error {
-      pb_resp.set_error(error.into_protobuf());
+    match self.result {
+      Ok(id) => pb_resp.set_collection_id(id.into_protobuf()),
+      Err(err) => pb_resp.set_error(err.into_protobuf()),
     }
-    pb_resp.set_collection_id(self.collection_id.into_protobuf());
     pb_resp
   }
 }
@@ -82,11 +77,8 @@ mod tests {
 
   impl RequiredFields for CollectionCreateResponse {
     fn required_fields() -> CollectionCreateResponse {
-      let collection_id = CollectionId::required_fields();
-      CollectionCreateResponse {
-        collection_id,
-        error: None,
-      }
+      let id = CollectionId::required_fields();
+      CollectionCreateResponse { result: Ok(id) }
     }
   }
 

@@ -91,16 +91,14 @@ message CollectionCreateResponse {
 //   Error error = 2;
 // }
 
-// message CollectionSearchRequest {
-//   RequestId request_id = 1;
-//   NodeId node_id = 2;
-// }
+message CollectionSearchRequest {
+  NodeId node_id = 1;
+}
 
-// message CollectionSearchResponse {
-//   RequestId request_id = 1;
-//   Error error = 2;
-//   repeated CollectionId collection_ids = 3;
-// }
+message CollectionSearchResponse {
+  Error error = 1;
+  repeated CollectionId collection_ids = 2;
+}
 
 // message BundleCreateRequest {
 //   RequestId request_id = 1;

@@ -141,20 +141,19 @@ impl Library {
   }
 
   fn initialize_settings(&self) -> Result<(), Error> {
-    // TODO should node_id be node_pubkey instead?
-    self.execute("CREATE TABLE settings (node_id BLOB NOT NULL);")?;
+    self.execute("CREATE TABLE settings (node_pubkey BLOB NOT NULL);")?;
 
     let node_id = api::NodeId::from_pubkey(random());
 
     let blob: &[u8] = &node_id.key().bytes;
 
-    self.call("INSERT INTO settings (node_id) VALUES (?1)", &[&blob])?;
+    self.call("INSERT INTO settings (node_pubkey) VALUES (?1)", &[&blob])?;
 
     Ok(())
   }
 
-  fn node_id(&self) -> Result<NodeId, Error> {
-    let blob = self.query_scalar::<Vec<u8>>("SELECT node_id FROM settings;")?;
+  pub fn node_id(&self) -> Result<NodeId, Error> {
+    let blob = self.query_scalar::<Vec<u8>>("SELECT node_pubkey FROM settings;")?;
     Pubkey::from_slice(&blob)
       .map_err(|pubkey_error| Error::LibraryStoredNodeId { pubkey_error })
       .map(NodeId::from_pubkey)
@@ -173,27 +172,7 @@ impl Library {
       "INSERT INTO collections (collection_pubkey) VALUES (?1)",
       &[&blob],
     )?;
-    self.collection_get(pubkey)
-  }
-
-  fn collection_get(&self, pubkey: Pubkey) -> Result<api::CollectionId, Error> {
-    fn get(row: &Row) -> Vec<u8> {
-      row.get(0)
-    }
-
-    let statement = "SELECT collection_pubkey FROM collections WHERE collection_pubkey = ?1";
-    let query_blob: &[u8] = &pubkey.bytes[..];
-
-    let blob = self
-      .connection
-      .lock()
-      .expect("library connection lock poisoned")
-      .query_row(statement, &[&query_blob], get)
-      .embellish(self, statement)?;
-
-    Pubkey::from_slice(&blob)
-      .map_err(|pubkey_error| Error::LibraryStoredNodeId { pubkey_error })
-      .map(api::CollectionId::from_pubkey)
+    Ok(collection_id)
   }
 
   fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {
@@ -332,7 +311,7 @@ mod tests {
     let Test { library, _tempdir } = Test::new();
 
     library
-      .execute("UPDATE settings SET node_id = x'012345';")
+      .execute("UPDATE settings SET node_pubkey = x'012345';")
       .unwrap();
 
     match library.node_id() {
@@ -487,5 +466,25 @@ mod tests {
         otherwise => panic!("unexpected result: {:?}", otherwise),
       }
     }
+  }
+
+  #[test]
+  fn collection_create() {
+    let tempdir = TempDir::new().unwrap();
+
+    let db = tempdir.child("library.db");
+    let library = Library::with_path(db.path()).unwrap();
+
+    let count = library
+      .query_scalar::<u32>("SELECT count(*) FROM collections")
+      .unwrap();
+    assert_eq!(count, 0);
+
+    let _collection_id = library.collection_create().unwrap();
+
+    let count = library
+      .query_scalar::<u32>("SELECT count(*) FROM collections")
+      .unwrap();
+    assert_eq!(count, 1);
   }
 }

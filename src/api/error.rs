@@ -1,6 +1,7 @@
 use super::*;
 
 const ERROR_PARSE: u32 = 1;
+const ERROR_WOULD_PROXY: u32 = 2;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct Error {
@@ -12,6 +13,7 @@ pub struct Error {
 pub enum ErrorKind {
   Unknown { code: u32 },
   Parse,
+  WouldProxy,
 }
 
 impl ErrorKind {
@@ -29,6 +31,7 @@ impl Error {
     match self.kind {
       Unknown { code } => code,
       Parse => ERROR_PARSE,
+      WouldProxy => ERROR_WOULD_PROXY,
     }
   }
 
@@ -46,6 +49,7 @@ impl Error {
     use self::ErrorKind::*;
     let kind = match code {
       ERROR_PARSE => Parse,
+      ERROR_WOULD_PROXY => WouldProxy,
       _ => Unknown { code },
     };
     Error { message, kind }
@@ -57,8 +61,16 @@ mod tests {
   use super::*;
 
   #[test]
-  fn error() {
+  fn parse() {
     let first_error = ErrorKind::Parse.into_error("foo");
+    let pb_err = first_error.clone().into_protobuf();
+    let second_error = Error::from_protobuf(pb_err);
+    assert_eq!(second_error, first_error);
+  }
+
+  #[test]
+  fn would_proxy() {
+    let first_error = ErrorKind::WouldProxy.into_error("foo");
     let pb_err = first_error.clone().into_protobuf();
     let second_error = Error::from_protobuf(pb_err);
     assert_eq!(second_error, first_error);

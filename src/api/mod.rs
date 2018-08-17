@@ -3,6 +3,7 @@ use svc;
 
 mod collection_create;
 mod collection_id;
+mod collection_search;
 mod error;
 mod from_protobuf;
 mod into_protobuf;
