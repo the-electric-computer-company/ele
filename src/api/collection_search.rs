@@ -1,5 +1,7 @@
 use super::*;
 
+use protobuf::RepeatedField;
+
 #[derive(PartialEq, Debug, Clone)]
 pub struct CollectionSearchRequest {
   pub node_id: NodeId,
@@ -33,18 +35,19 @@ pub struct CollectionSearchResponse {
 
 impl FromProtobuf for CollectionSearchResponse {
   type Protobuf = svc::CollectionSearchResponse;
-  type Error = Error;
+  type Error = api::Error;
 
   fn from_protobuf(
-    pb_resp: svc::CollectionSearchResponse,
+    mut response: svc::CollectionSearchResponse,
   ) -> Result<CollectionSearchResponse, Error> {
-    let mut pb_resp = pb_resp;
-    let result = if pb_resp.has_error() {
-      Err(Error::from_protobuf(pb_resp.take_error()))
+    let result = if response.has_error() {
+      Err(Error::from_protobuf(response.take_error()))
     } else {
-      Ok(CollectionId::from_protobuf(
-        pb_resp.take_collection_ids().into_vec().,
-      )?)
+      response
+        .take_collection_ids()
+        .into_iter()
+        .map(|protobuf| CollectionId::from_protobuf(protobuf))
+        .collect::<Result<Vec<CollectionId>, api::Error>>()
     };
 
     Ok(CollectionSearchResponse { result })
@@ -55,46 +58,48 @@ impl IntoProtobuf for CollectionSearchResponse {
   type Protobuf = svc::CollectionSearchResponse;
 
   fn into_protobuf(self) -> svc::CollectionSearchResponse {
-    let mut pb_resp = svc::CollectionSearchResponse::new();
+    let mut response = svc::CollectionSearchResponse::new();
     match self.result {
-      Ok(id) => pb_resp.set_collection_id(id.into_protobuf()),
-      Err(err) => pb_resp.set_error(err.into_protobuf()),
+      Ok(ids) => response.set_collection_ids(RepeatedField::from_vec(
+        ids
+          .into_iter()
+          .map(|collection_id| collection_id.into_protobuf())
+          .collect(),
+      )),
+      Err(err) => response.set_error(err.into_protobuf()),
     }
-    pb_resp
+    response
   }
 }
 
-// #[cfg(test)]
-// mod tests {
-//   use super::*;
+#[cfg(test)]
+mod tests {
+  use super::*;
 
-//   use super::super::tests::*;
+  use super::super::tests::*;
 
-//   impl RequiredFields for CollectionCreateRequest {
-//     fn required_fields() -> CollectionCreateRequest {
-//       let node_id = NodeId::required_fields();
-//       CollectionCreateRequest { node_id }
-//     }
-//   }
+  impl RequiredFields for CollectionSearchRequest {
+    fn required_fields() -> CollectionSearchRequest {
+      let node_id = NodeId::required_fields();
+      CollectionSearchRequest { node_id }
+    }
+  }
 
-//   impl RequiredFields for CollectionCreateResponse {
-//     fn required_fields() -> CollectionCreateResponse {
-//       let id = CollectionId::required_fields();
-//       CollectionCreateResponse { result: Ok(id) }
-//     }
-//   }
+  impl RequiredFields for CollectionSearchResponse {
+    fn required_fields() -> CollectionSearchResponse {
+      CollectionSearchResponse { result: Ok(vec![]) }
+    }
+  }
 
-//   #[test]
-//   fn collection_create_request_required_fields() {
-//     test_required_fields::<CollectionCreateRequest, svc::CollectionCreateRequest>(&[|p| {
-//       p.set_node_id(NodeId::required_fields().into_protobuf())
-//     }])
-//   }
+  #[test]
+  fn collection_search_request_required_fields() {
+    test_required_fields::<CollectionSearchRequest, svc::CollectionSearchRequest>(&[|p| {
+      p.set_node_id(NodeId::required_fields().into_protobuf())
+    }]);
+  }
 
-//   #[test]
-//   fn collection_create_response_required_fields() {
-//     test_required_fields::<CollectionCreateResponse, svc::CollectionCreateResponse>(&[|p| {
-//       p.set_collection_id(CollectionId::required_fields().into_protobuf())
-//     }])
-//   }
-// }
+  #[test]
+  fn collection_search_response_required_fields() {
+    test_required_fields::<CollectionSearchResponse, svc::CollectionSearchResponse>(&[]);
+  }
+}

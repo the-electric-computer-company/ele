@@ -12,6 +12,7 @@ mod node_id;
 pub use self::{
   collection_create::{CollectionCreateRequest, CollectionCreateResponse},
   collection_id::CollectionId,
+  collection_search::{CollectionSearchRequest, CollectionSearchResponse},
   error::{Error, ErrorKind},
   from_protobuf::FromProtobuf,
   into_protobuf::IntoProtobuf,
@@ -69,5 +70,6 @@ pub mod tests {
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
     test_round_trip::<CollectionCreateResponse, svc::CollectionCreateResponse>();
+    test_round_trip::<CollectionSearchResponse, svc::CollectionSearchResponse>();
   }
 }
