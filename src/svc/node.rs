@@ -752,7 +752,7 @@ impl CollectionCreateRequest {
         ::std::default::Default::default()
     }
 
-    // .NodeId node_id = 2;
+    // .NodeId node_id = 1;
 
     pub fn clear_node_id(&mut self) {
         self.node_id.clear();
@@ -800,7 +800,7 @@ impl ::protobuf::Message for CollectionCreateRequest {
         while !is.eof()? {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
-                2 => {
+                1 => {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.node_id)?;
                 },
                 _ => {
@@ -826,7 +826,7 @@ impl ::protobuf::Message for CollectionCreateRequest {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         if let Some(ref v) = self.node_id.as_ref() {
-            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
@@ -931,7 +931,7 @@ impl CollectionCreateResponse {
         ::std::default::Default::default()
     }
 
-    // .Error error = 2;
+    // .Error error = 1;
 
     pub fn clear_error(&mut self) {
         self.error.clear();
@@ -964,7 +964,7 @@ impl CollectionCreateResponse {
         self.error.as_ref().unwrap_or_else(|| Error::default_instance())
     }
 
-    // .CollectionId collection_id = 3;
+    // .CollectionId collection_id = 2;
 
     pub fn clear_collection_id(&mut self) {
         self.collection_id.clear();
@@ -1017,10 +1017,10 @@ impl ::protobuf::Message for CollectionCreateResponse {
         while !is.eof()? {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
-                2 => {
+                1 => {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.error)?;
                 },
-                3 => {
+                2 => {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.collection_id)?;
                 },
                 _ => {
@@ -1050,12 +1050,12 @@ impl ::protobuf::Message for CollectionCreateResponse {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         if let Some(ref v) = self.error.as_ref() {
-            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
         if let Some(ref v) = self.collection_id.as_ref() {
-            os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
@@ -1158,9 +1158,9 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     node_pubkey\x18\x01\x20\x01(\x0b2\x07.PubkeyR\nnodePubkey\"D\n\x0cCollec\
     tionId\x124\n\x11collection_pubkey\x18\x02\x20\x01(\x0b2\x07.PubkeyR\x10\
     collectionPubkey\";\n\x17CollectionCreateRequest\x12\x20\n\x07node_id\
-    \x18\x02\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"l\n\x18CollectionCreateRes\
-    ponse\x12\x1c\n\x05error\x18\x02\x20\x01(\x0b2\x06.ErrorR\x05error\x122\
-    \n\rcollection_id\x18\x03\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId2\
+    \x18\x01\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"l\n\x18CollectionCreateRes\
+    ponse\x12\x1c\n\x05error\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x122\
+    \n\rcollection_id\x18\x02\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId2\
     Q\n\x04Node\x12I\n\x10CollectionCreate\x12\x18.CollectionCreateRequest\
     \x1a\x19.CollectionCreateResponse\"\0b\x06proto3\
 ";

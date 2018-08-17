@@ -1,7 +1,11 @@
 #[macro_use]
-extern crate log;
-#[macro_use]
 extern crate structopt;
+
+#[macro_use]
+extern crate log;
+
+#[cfg(test)]
+mod testing;
 
 #[cfg(test)]
 extern crate assert_fs;
@@ -22,18 +26,16 @@ extern crate uuid;
 #[macro_use]
 mod show;
 
-#[cfg(test)]
-mod testing;
-
+pub mod api;
 mod common;
 mod error;
 mod library;
 mod node;
 mod platform;
+pub mod pubkey;
 mod svc;
 
 use common::*;
-mod api;
 
 use structopt::clap::AppSettings;
 use structopt::StructOpt;

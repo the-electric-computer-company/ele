@@ -35,7 +35,7 @@ message NodeId {
 }
 
 message CollectionId {
- Pubkey collection_pubkey = 2;
+  Pubkey collection_pubkey = 2;
 }
 
 // message BundleId {
@@ -72,12 +72,12 @@ message CollectionId {
 // }
 
 message CollectionCreateRequest {
-  NodeId node_id = 2;
+  NodeId node_id = 1;
 }
 
 message CollectionCreateResponse {
-  Error error = 2;
-  CollectionId collection_id = 3;
+  Error error = 1;
+  CollectionId collection_id = 2;
 }
 
 // message CollectionUpdateRequest {

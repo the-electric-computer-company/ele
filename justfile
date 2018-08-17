@@ -1,13 +1,15 @@
 # default to `test`
 default: test
 
-log='warn'
+log='off'
 
 bt='0'
 
 version = `head -3 Cargo.toml | sed -En 's/^version[[:space:]]*=[[:space:]]*"([^"]+)"/v\1/p'`
 
 export RUST_BACKTRACE = bt
+
+export RUST_LOG = "ele=" + log
 
 # run tests
 test:
@@ -35,7 +37,7 @@ fmt:
 doc:
 	cargo rustdoc --open -- --document-private-items
 
-# watch for changes and run `cargo fmt` and `cargo check`
+# watch for changes and run tests on changes
 watch:
 	cargo watch --ignore 'src/svc/*' --clear --exec test
 

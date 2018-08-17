@@ -21,4 +21,6 @@ pub enum Error {
     application_id: i32,
     database_path: PathBuf,
   },
+  /// Node ID stored in library database was invalid
+  LibraryStoredNodeId { pubkey_error: pubkey::Error },
 }

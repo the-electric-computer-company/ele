@@ -1,4 +1,3 @@
-use api::{self, IntoProtobuf};
 use common::*;
 use grpc;
 #[allow(unused_imports)]
@@ -24,32 +23,41 @@ impl svc::Node for Node {
     _o: ::grpc::RequestOptions,
     _pb_create_req: svc::CollectionCreateRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionCreateResponse> {
-    let create_resp = api::CollectionCreateResponse {
-      error: None,
-      collection_id: api::CollectionId::new(),
-    };
+    unimplemented!();
 
-    grpc::SingleResponse::completed(create_resp.into_protobuf())
+    // let create_resp = api::CollectionCreateResponse {
+    //   error: None,
+    //   collection_id: api::CollectionId::new(),
+    // };
+
+    // grpc::SingleResponse::completed(create_resp.into_protobuf())
   }
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
-  use env_logger;
-  use log::LevelFilter;
-  use std::default;
+  // use env_logger;
+  // use log::LevelFilter;
 
   fn test_client() -> svc::NodeClient {
     let conf = grpc::ClientConf::new();
     svc::NodeClient::new_plain("127.0.0.1", 2018, conf).unwrap()
   }
 
-  fn test_server() -> grpc::Server {
-    let lib_path = Library::default_path();
-    let library = Library::with_path(lib_path).unwrap();
-    let node = Node::new(library);
+  fn test_node() -> Node {
+    let tempdir = TempDir::new().unwrap();
 
+    let library_child = tempdir.child("library.db");
+    let library_path = library_child.path();
+
+    let library = Library::with_path(library_path).unwrap();
+
+    Node::new(library)
+  }
+
+  fn test_server() -> grpc::Server {
+    let node = test_node();
     let mut server = grpc::ServerBuilder::new_plain();
     server.http.set_addr("127.0.0.1:2018").unwrap();
     server.add_service(svc::NodeServer::new_service_def(node));
@@ -58,23 +66,21 @@ mod tests {
   }
 
   #[test]
-  fn test_collection_create() {
-    env_logger::Builder::from_default_env()
-      .filter_level(LevelFilter::Error)
-      .init();
+  fn collection_create() {
+    test_init();
 
     let _server = test_server();
-    let client = test_client();
+    let _client = test_client();
 
-    let create_req = api::CollectionCreateRequest {
-      node_id: api::NodeId::new(),
-    };
+    // let create_req = api::CollectionCreateRequest {
+    //   node_id: api::NodeId::new(),
+    // };
 
-    let (_, resp, _) = client
-      .collection_create(default::Default::default(), create_req.into_protobuf())
-      .wait()
-      .unwrap();
+    // let (_, resp, _) = client
+    //   .collection_create(default::Default::default(), create_req.into_protobuf())
+    //   .wait()
+    //   .unwrap();
 
-    println!("resp: {:?}", resp);
+    // println!("resp: {:?}", resp);
   }
 }
