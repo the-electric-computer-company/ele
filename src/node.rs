@@ -76,8 +76,7 @@ impl svc::Node for Node {
     o: ::grpc::RequestOptions,
     req: svc::CollectionSearchRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionSearchResponse> {
-    let result = self.collection_search_inner(req);
-    let resp = api::CollectionSearchResponse { result };
+    let resp = self.collection_search_inner(req);
     grpc::SingleResponse::completed(resp.into_protobuf())
   }
 }
@@ -129,7 +128,7 @@ mod tests {
       .unwrap();
 
     let resp = api::CollectionSearchResponse::from_protobuf(resp).unwrap();
-    resp.result.unwrap()
+    resp.unwrap()
   }
 
   #[test]

@@ -28,10 +28,7 @@ impl IntoProtobuf for CollectionSearchRequest {
   }
 }
 
-#[derive(PartialEq, Debug, Clone)]
-pub struct CollectionSearchResponse {
-  pub result: Result<Vec<CollectionId>, Error>,
-}
+pub type CollectionSearchResponse = Result<Vec<CollectionId>, Error>;
 
 impl FromProtobuf for CollectionSearchResponse {
   type Protobuf = svc::CollectionSearchResponse;
@@ -50,7 +47,7 @@ impl FromProtobuf for CollectionSearchResponse {
         .collect::<Result<Vec<CollectionId>, api::Error>>()
     };
 
-    Ok(CollectionSearchResponse { result })
+    Ok(result)
   }
 }
 
@@ -59,7 +56,7 @@ impl IntoProtobuf for CollectionSearchResponse {
 
   fn into_protobuf(self) -> svc::CollectionSearchResponse {
     let mut response = svc::CollectionSearchResponse::new();
-    match self.result {
+    match self {
       Ok(ids) => response.set_collection_ids(RepeatedField::from_vec(
         ids
           .into_iter()
@@ -87,7 +84,7 @@ mod tests {
 
   impl RequiredFields for CollectionSearchResponse {
     fn required_fields() -> CollectionSearchResponse {
-      CollectionSearchResponse { result: Ok(vec![]) }
+      Ok(vec![])
     }
   }
 
