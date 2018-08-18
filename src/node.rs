@@ -109,6 +109,29 @@ mod tests {
     server.build().unwrap()
   }
 
+  fn create_req(client: &svc::NodeClient, node_id: NodeId) -> api::CollectionId {
+    let create_req = api::CollectionCreateRequest { node_id };
+
+    let (_, resp, _) = client
+      .collection_create(Default::default(), create_req.into_protobuf())
+      .wait()
+      .unwrap();
+    let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
+    resp.result.unwrap()
+  }
+
+  fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<api::CollectionId> {
+    let req = api::CollectionSearchRequest { node_id };
+
+    let (_, resp, _) = client
+      .collection_search(Default::default(), req.into_protobuf())
+      .wait()
+      .unwrap();
+
+    let resp = api::CollectionSearchResponse::from_protobuf(resp).unwrap();
+    resp.result.unwrap()
+  }
+
   #[test]
   fn collection_create_success() {
     test_init();
@@ -119,15 +142,7 @@ mod tests {
     let server = test_server(node);
     let client = test_client(server.local_addr().port().unwrap());
 
-    let create_req = api::CollectionCreateRequest { node_id };
-
-    let (_, resp, _) = client
-      .collection_create(Default::default(), create_req.into_protobuf())
-      .wait()
-      .unwrap();
-
-    let create_resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
-    assert_eq!(create_resp.result.is_ok(), true);
+    create_req(&client, node_id);
   }
 
   #[test]
@@ -154,29 +169,6 @@ mod tests {
       Ok(value) => panic!("expected error: {:?}", value),
       Err(api::Error { kind, .. }) => assert_eq!(kind, api::ErrorKind::WouldProxy),
     }
-  }
-
-  fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<api::CollectionId> {
-    let req = api::CollectionSearchRequest { node_id };
-
-    let (_, resp, _) = client
-      .collection_search(Default::default(), req.into_protobuf())
-      .wait()
-      .unwrap();
-
-    let resp = api::CollectionSearchResponse::from_protobuf(resp).unwrap();
-    resp.result.unwrap()
-  }
-
-  fn create_req(client: &svc::NodeClient, node_id: NodeId) -> api::CollectionId {
-    let create_req = api::CollectionCreateRequest { node_id };
-
-    let (_, resp, _) = client
-      .collection_create(Default::default(), create_req.into_protobuf())
-      .wait()
-      .unwrap();
-    let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
-    resp.result.unwrap()
   }
 
   #[test]
