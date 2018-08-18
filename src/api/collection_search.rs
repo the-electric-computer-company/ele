@@ -43,7 +43,7 @@ impl FromProtobuf for CollectionSearchResponse {
       response
         .take_collection_ids()
         .into_iter()
-        .map(|protobuf| CollectionId::from_protobuf(protobuf))
+        .map(CollectionId::from_protobuf)
         .collect::<Result<Vec<CollectionId>, api::Error>>()
     };
 
