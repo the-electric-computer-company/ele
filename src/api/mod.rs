@@ -4,6 +4,7 @@ use svc;
 mod collection_create;
 mod collection_id;
 mod collection_search;
+mod collection_update;
 mod error;
 mod from_protobuf;
 mod into_protobuf;
@@ -13,6 +14,7 @@ pub use self::{
   collection_create::{CollectionCreateRequest, CollectionCreateResponse},
   collection_id::CollectionId,
   collection_search::{CollectionSearchRequest, CollectionSearchResponse},
+  collection_update::{CollectionUpdateRequest, CollectionUpdateResponse},
   error::{Error, ErrorKind},
   from_protobuf::FromProtobuf,
   into_protobuf::IntoProtobuf,
@@ -70,6 +72,9 @@ pub mod tests {
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
     test_round_trip::<CollectionCreateResponse, svc::CollectionCreateResponse>();
+    test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
     test_round_trip::<CollectionSearchResponse, svc::CollectionSearchResponse>();
+    test_round_trip::<CollectionUpdateRequest, svc::CollectionUpdateRequest>();
+    test_round_trip::<CollectionUpdateResponse, svc::CollectionUpdateResponse>();
   }
 }

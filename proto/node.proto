@@ -80,16 +80,14 @@ message CollectionCreateResponse {
   CollectionId collection_id = 2;
 }
 
-// message CollectionUpdateRequest {
-//   RequestId request_id = 1;
-//   CollectionId collection_id = 2;
-//   string name = 3;
-// }
+message CollectionUpdateRequest {
+  CollectionId collection_id = 1;
+  string name = 2;
+}
 
-// message CollectionUpdateResponse {
-//   RequestId request_id = 1;
-//   Error error = 2;
-// }
+message CollectionUpdateResponse {
+  Error error = 1;
+}
 
 message CollectionSearchRequest {
   NodeId node_id = 1;

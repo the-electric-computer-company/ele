@@ -2,6 +2,7 @@ use super::*;
 
 const ERROR_PARSE: u32 = 1;
 const ERROR_WOULD_PROXY: u32 = 2;
+const ERROR_INVALID_COLLECTION_NAME: u32 = 3;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct Error {
@@ -14,6 +15,7 @@ pub enum ErrorKind {
   Unknown { code: u32 },
   Parse,
   WouldProxy,
+  InvalidCollectionName,
 }
 
 impl ErrorKind {
@@ -32,6 +34,7 @@ impl Error {
       Unknown { code } => code,
       Parse => ERROR_PARSE,
       WouldProxy => ERROR_WOULD_PROXY,
+      InvalidCollectionName => ERROR_INVALID_COLLECTION_NAME,
     }
   }
 
