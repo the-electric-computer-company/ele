@@ -1,6 +1,5 @@
 use common::*;
 use grpc;
-use protobuf::RepeatedField;
 #[allow(unused_imports)]
 use svc::{self, Node as _Node};
 
@@ -66,14 +65,13 @@ impl svc::Node for Node {
     _o: ::grpc::RequestOptions,
     req: svc::CollectionCreateRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionCreateResponse> {
-    let result = self.collection_create_inner(req);
-    let resp = api::CollectionCreateResponse { result };
+    let resp = self.collection_create_inner(req);
     grpc::SingleResponse::completed(resp.into_protobuf())
   }
 
   fn collection_search(
     &self,
-    o: ::grpc::RequestOptions,
+    _o: ::grpc::RequestOptions,
     req: svc::CollectionSearchRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionSearchResponse> {
     let resp = self.collection_search_inner(req);
@@ -116,7 +114,7 @@ mod tests {
       .wait()
       .unwrap();
     let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
-    resp.result.unwrap()
+    resp.unwrap()
   }
 
   fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<api::CollectionId> {
@@ -155,16 +153,16 @@ mod tests {
 
     let node_id = NodeId::from_pubkey(random());
 
-    let create_req = api::CollectionCreateRequest { node_id };
+    let req = api::CollectionCreateRequest { node_id };
 
     let (_, resp, _) = client
-      .collection_create(Default::default(), create_req.into_protobuf())
+      .collection_create(Default::default(), req.into_protobuf())
       .wait()
       .unwrap();
 
-    let create_resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
+    let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
 
-    match create_resp.result {
+    match resp {
       Ok(value) => panic!("expected error: {:?}", value),
       Err(api::Error { kind, .. }) => assert_eq!(kind, api::ErrorKind::WouldProxy),
     }

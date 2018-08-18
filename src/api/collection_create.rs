@@ -26,10 +26,7 @@ impl IntoProtobuf for CollectionCreateRequest {
   }
 }
 
-#[derive(PartialEq, Debug, Clone)]
-pub struct CollectionCreateResponse {
-  pub result: Result<CollectionId, Error>,
-}
+pub type CollectionCreateResponse = Result<CollectionId, Error>;
 
 impl FromProtobuf for CollectionCreateResponse {
   type Protobuf = svc::CollectionCreateResponse;
@@ -45,7 +42,7 @@ impl FromProtobuf for CollectionCreateResponse {
       Ok(CollectionId::from_protobuf(pb_resp.take_collection_id())?)
     };
 
-    Ok(CollectionCreateResponse { result })
+    Ok(result)
   }
 }
 
@@ -54,7 +51,7 @@ impl IntoProtobuf for CollectionCreateResponse {
 
   fn into_protobuf(self) -> svc::CollectionCreateResponse {
     let mut pb_resp = svc::CollectionCreateResponse::new();
-    match self.result {
+    match self {
       Ok(id) => pb_resp.set_collection_id(id.into_protobuf()),
       Err(err) => pb_resp.set_error(err.into_protobuf()),
     }
@@ -78,7 +75,7 @@ mod tests {
   impl RequiredFields for CollectionCreateResponse {
     fn required_fields() -> CollectionCreateResponse {
       let id = CollectionId::required_fields();
-      CollectionCreateResponse { result: Ok(id) }
+      Ok(id)
     }
   }
 
