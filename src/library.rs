@@ -187,28 +187,20 @@ impl Library {
       .lock()
       .expect("library connection lock poisoned");
 
-    let mut stmt = lock.prepare(statement).unwrap();
-    let rows = stmt.query_map(&[], get).unwrap();
+    let mut stmt = lock.prepare(statement).embellish(self, statement)?;
+    let rows = stmt.query_map(&[], get).embellish(self, statement)?;
 
-    let ids = rows
-      .map(|row| {
-        let blob = row.embellish(self, statement)?;
-        Pubkey::from_slice(&blob)
-          .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
-          .map(api::CollectionId::from_pubkey)
-      }).collect::<Result<Vec<api::CollectionId>, Error>>()?;
+    let mut ids = vec![];
+    for row in rows {
+      let blob = row.embellish(self, statement)?;
+
+      let id = Pubkey::from_slice(&blob)
+        .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
+        .map(api::CollectionId::from_pubkey)?;
+      ids.push(id);
+    }
 
     Ok(ids)
-
-    // let mut ids = vec![];
-    // for blob in rows {
-    //   let id = Pubkey::from_slice(&(blob.unwrap()))
-    //     .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
-    //     .map(api::CollectionId::from_pubkey)?;
-    //   ids.push(id);
-    // }
-
-    // Ok(ids)
   }
 
   fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {
