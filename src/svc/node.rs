@@ -1569,9 +1569,10 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     rchRequest\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\x07.NodeIdR\x06nod\
     eId\"n\n\x18CollectionSearchResponse\x12\x1c\n\x05error\x18\x01\x20\x01(\
     \x0b2\x06.ErrorR\x05error\x124\n\x0ecollection_ids\x18\x02\x20\x03(\x0b2\
-    \r.CollectionIdR\rcollectionIds2Q\n\x04Node\x12I\n\x10CollectionCreate\
-    \x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0b\
-    \x06proto3\
+    \r.CollectionIdR\rcollectionIds2\x9c\x01\n\x04Node\x12I\n\x10CollectionC\
+    reate\x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\
+    \0\x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.Co\
+    llectionSearchResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

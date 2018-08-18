@@ -1,5 +1,6 @@
 use common::*;
 use grpc;
+use protobuf::RepeatedField;
 #[allow(unused_imports)]
 use svc::{self, Node as _Node};
 
@@ -25,6 +26,10 @@ impl Node {
     Ok(())
   }
 
+  // The purpose of inner functions is to allow for idiomatic rust error
+  // handling, which is not possible within the service definition due to the
+  // grpc response types.
+
   fn collection_create_inner(
     &self,
     req: svc::CollectionCreateRequest,
@@ -39,6 +44,20 @@ impl Node {
       Err(api::ErrorKind::WouldProxy.into_error("proxy not implemented"))
     }
   }
+
+  fn collection_search_inner(
+    &self,
+    req: svc::CollectionSearchRequest,
+  ) -> Result<Vec<api::CollectionId>, api::Error> {
+    let req = api::CollectionSearchRequest::from_protobuf(req)?;
+
+    let node_id = unwrap_internal_error(self.library.node_id());
+    if req.node_id == node_id {
+      Ok(unwrap_internal_error(self.library.collection_search()))
+    } else {
+      Err(api::ErrorKind::WouldProxy.into_error("proxy not implemented"))
+    }
+  }
 }
 
 impl svc::Node for Node {
@@ -49,6 +68,16 @@ impl svc::Node for Node {
   ) -> ::grpc::SingleResponse<svc::CollectionCreateResponse> {
     let result = self.collection_create_inner(req);
     let resp = api::CollectionCreateResponse { result };
+    grpc::SingleResponse::completed(resp.into_protobuf())
+  }
+
+  fn collection_search(
+    &self,
+    o: ::grpc::RequestOptions,
+    req: svc::CollectionSearchRequest,
+  ) -> ::grpc::SingleResponse<svc::CollectionSearchResponse> {
+    let result = self.collection_search_inner(req);
+    let resp = api::CollectionSearchResponse { result };
     grpc::SingleResponse::completed(resp.into_protobuf())
   }
 }
@@ -126,4 +155,47 @@ mod tests {
       Err(api::Error { kind, .. }) => assert_eq!(kind, api::ErrorKind::WouldProxy),
     }
   }
+
+  fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<api::CollectionId> {
+    let req = api::CollectionSearchRequest { node_id };
+
+    let (_, resp, _) = client
+      .collection_search(Default::default(), req.into_protobuf())
+      .wait()
+      .unwrap();
+
+    let resp = api::CollectionSearchResponse::from_protobuf(resp).unwrap();
+    resp.result.unwrap()
+  }
+
+  fn create_req(client: &svc::NodeClient, node_id: NodeId) -> api::CollectionId {
+    let create_req = api::CollectionCreateRequest { node_id };
+
+    let (_, resp, _) = client
+      .collection_create(Default::default(), create_req.into_protobuf())
+      .wait()
+      .unwrap();
+    let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
+    resp.result.unwrap()
+  }
+
+  #[test]
+  fn collection_search_success() {
+    test_init();
+
+    let node = test_node();
+    let node_id = node.library.node_id().unwrap();
+
+    let server = test_server(node);
+    let client = test_client(server.local_addr().port().unwrap());
+
+    let ids = search_req(&client, node_id.clone());
+    assert_eq!(ids.len(), 0);
+
+    create_req(&client, node_id.clone());
+
+    let ids = search_req(&client, node_id.clone());
+    assert_eq!(ids.len(), 1);
+  }
+
 }

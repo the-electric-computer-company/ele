@@ -23,4 +23,7 @@ pub enum Error {
   },
   /// Node ID stored in library database was invalid
   LibraryStoredNodeId { pubkey_error: pubkey::Error },
+
+  /// Collection ID stored in library database was invalid
+  LibraryStoredCollectionId { pubkey_error: pubkey::Error },
 }

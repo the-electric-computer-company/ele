@@ -175,6 +175,42 @@ impl Library {
     Ok(collection_id)
   }
 
+  pub fn collection_search(&self) -> Result<Vec<api::CollectionId>, Error> {
+    fn get(row: &Row) -> Vec<u8> {
+      row.get(0)
+    }
+
+    let statement = "SELECT collection_pubkey from collections;";
+
+    let lock = self
+      .connection
+      .lock()
+      .expect("library connection lock poisoned");
+
+    let mut stmt = lock.prepare(statement).unwrap();
+    let rows = stmt.query_map(&[], get).unwrap();
+
+    let ids = rows
+      .map(|row| {
+        let blob = row.embellish(self, statement)?;
+        Pubkey::from_slice(&blob)
+          .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
+          .map(api::CollectionId::from_pubkey)
+      }).collect::<Result<Vec<api::CollectionId>, Error>>()?;
+
+    Ok(ids)
+
+    // let mut ids = vec![];
+    // for blob in rows {
+    //   let id = Pubkey::from_slice(&(blob.unwrap()))
+    //     .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
+    //     .map(api::CollectionId::from_pubkey)?;
+    //   ids.push(id);
+    // }
+
+    // Ok(ids)
+  }
+
   fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {
     self
       .connection
