@@ -7,6 +7,7 @@ mod collection_search;
 mod error;
 mod from_protobuf;
 mod into_protobuf;
+mod message;
 mod node_id;
 
 pub use self::{
@@ -16,6 +17,7 @@ pub use self::{
   error::{Error, ErrorKind},
   from_protobuf::FromProtobuf,
   into_protobuf::IntoProtobuf,
+  message::Message,
   node_id::NodeId,
 };
 
@@ -93,9 +95,25 @@ pub mod tests {
   #[test]
   fn round_trips() {
     test_round_trip::<Pubkey, svc::Pubkey>();
-    test_round_trip::<NodeId, svc::NodeId>();
+    // test_round_trip::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
     test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+  }
+
+  fn test_round_trip_message<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
+    let obj = T::required_fields_message();
+    let pb = obj.clone().into_protobuf_message();
+    let obj2 = T::from_protobuf_message(pb).unwrap();
+    assert_eq!(obj2, obj);
+  }
+
+  #[test]
+  fn round_trips_message() {
+    // test_round_trip::<Pubkey, svc::Pubkey>();
+    test_round_trip_message::<NodeId, svc::NodeId>();
+    // test_round_trip::<CollectionId, svc::CollectionId>();
+    // test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+    // test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
   }
 }
