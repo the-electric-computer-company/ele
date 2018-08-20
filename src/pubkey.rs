@@ -41,20 +41,23 @@ impl Distribution<Pubkey> for Standard {
   }
 }
 
-/*
-impl api::message::Message for Pubkey {
-pub trait Message: Sized {
-  type Protobuf;
-  type Error: Debug;
+impl api::Message for Pubkey {
+  type Protobuf = svc::Pubkey;
+  type Error = api::Error;
 
-  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error>;
+  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+    FromProtobuf::from_protobuf(protobuf)
+  }
 
-  fn into_protobuf_message(self) -> Self::Protobuf;
+  fn into_protobuf_message(self) -> Self::Protobuf {
+    self.into_protobuf()
+  }
 
   #[cfg(test)]
-  fn required_fields_message() -> Self;
+  fn required_fields_message() -> Self {
+    random()
+  }
 }
-*/
 
 impl IntoProtobuf for Pubkey {
   type Protobuf = svc::Pubkey;

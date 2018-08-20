@@ -94,7 +94,7 @@ pub mod tests {
 
   #[test]
   fn round_trips() {
-    test_round_trip::<Pubkey, svc::Pubkey>();
+    // test_round_trip::<Pubkey, svc::Pubkey>();
     // test_round_trip::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
@@ -110,7 +110,7 @@ pub mod tests {
 
   #[test]
   fn round_trips_message() {
-    // test_round_trip::<Pubkey, svc::Pubkey>();
+    test_round_trip_message::<Pubkey, svc::Pubkey>();
     test_round_trip_message::<NodeId, svc::NodeId>();
     // test_round_trip::<CollectionId, svc::CollectionId>();
     // test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
