@@ -10,9 +10,9 @@ mod into_protobuf;
 mod node_id;
 
 pub use self::{
-  collection_create::{CollectionCreateRequest, CollectionCreateResponse},
+  collection_create::CollectionCreateRequest,
   collection_id::CollectionId,
-  collection_search::{CollectionSearchRequest, CollectionSearchResponse},
+  collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
   from_protobuf::FromProtobuf,
   into_protobuf::IntoProtobuf,
@@ -36,20 +36,20 @@ macro_rules! response_to_protobuf {
 
 macro_rules! response_from_protobuf {
   ($protobuf:expr, $payload:ty) => {{
-    let protobuf = $protobuf;
+    let mut protobuf = $protobuf;
 
-    if protbuf.has_error() && protobuf.has_payload() {
-      unimplemeted!()
-    }
+    // if protobuf.has_error() && protobuf.has_payload() {
+    //   unimplemented!()
+    // }
 
-    if !protobuf.has_error() && !protobuf.has_payload() {
-      unimplemeted!()
-    }
+    // if !protobuf.has_error() && !protobuf.has_payload() {
+    //   unimplemented!()
+    // }
 
     if protobuf.has_error() {
-      api::Error::from_protobuf(protobuf.take_error())
+      Err(api::Error::from_protobuf(protobuf.take_error()))
     } else {
-      $payload::from_protobuf(protobuf.take_payload())
+      <$payload>::from_protobuf(protobuf.take_payload())
     }
   }};
 }
@@ -98,13 +98,22 @@ pub mod tests {
     assert_eq!(obj2, obj);
   }
 
+  /*
+  #[test]
+  fn response_round_trip() {
+    // test required fields
+    // test round trip
+  }
+  */
+
   #[test]
   fn round_trips() {
     test_round_trip::<Pubkey, svc::Pubkey>();
     test_round_trip::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
-    test_round_trip::<CollectionCreateResponse, svc::CollectionCreateResponse>();
-    test_round_trip::<CollectionSearchResponse, svc::CollectionSearchResponse>();
+    test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    // test_round_trip::<CollectionCreateResponse, svc::CollectionCreateResponse>();
+    // test_round_trip::<CollectionSearchResponse, svc::CollectionSearchResponse>();
   }
 }

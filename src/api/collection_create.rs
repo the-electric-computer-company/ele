@@ -26,39 +26,6 @@ impl IntoProtobuf for CollectionCreateRequest {
   }
 }
 
-pub type CollectionCreateResponse = Result<CollectionId, Error>;
-
-impl FromProtobuf for CollectionCreateResponse {
-  type Protobuf = svc::CollectionCreateResponse;
-  type Error = Error;
-
-  fn from_protobuf(
-    pb_resp: svc::CollectionCreateResponse,
-  ) -> Result<CollectionCreateResponse, Error> {
-    let mut pb_resp = pb_resp;
-    let result = if pb_resp.has_error() {
-      Err(Error::from_protobuf(pb_resp.take_error()))
-    } else {
-      Ok(CollectionId::from_protobuf(pb_resp.take_payload())?)
-    };
-
-    Ok(result)
-  }
-}
-
-impl IntoProtobuf for CollectionCreateResponse {
-  type Protobuf = svc::CollectionCreateResponse;
-
-  fn into_protobuf(self) -> svc::CollectionCreateResponse {
-    let mut pb_resp = svc::CollectionCreateResponse::new();
-    match self {
-      Ok(id) => pb_resp.set_payload(id.into_protobuf()),
-      Err(err) => pb_resp.set_error(err.into_protobuf()),
-    }
-    pb_resp
-  }
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -71,25 +38,10 @@ mod tests {
       CollectionCreateRequest { node_id }
     }
   }
-
-  impl RequiredFields for CollectionCreateResponse {
-    fn required_fields() -> CollectionCreateResponse {
-      let id = CollectionId::required_fields();
-      Ok(id)
-    }
-  }
-
   #[test]
   fn collection_create_request_required_fields() {
     test_required_fields::<CollectionCreateRequest, svc::CollectionCreateRequest>(&[|p| {
       p.set_node_id(NodeId::required_fields().into_protobuf())
-    }])
-  }
-
-  #[test]
-  fn collection_create_response_required_fields() {
-    test_required_fields::<CollectionCreateResponse, svc::CollectionCreateResponse>(&[|p| {
-      p.set_payload(CollectionId::required_fields().into_protobuf())
     }])
   }
 }

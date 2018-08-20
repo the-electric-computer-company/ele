@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 service Node {
+  rpc CollectionCreate(CollectionCreateRequest) returns(CollectionCreateResponse) {}
+  rpc CollectionSearch(CollectionSearchRequest) returns(CollectionSearchResponse) {}
   // rpc ArchiveHashGet(ArchiveHashGetRequest) returns (ArchiveHashGetResponse) {}
   // rpc ArchiveStream(ArchiveStreamRequest) returns (stream ArchiveStreamResponse) {}
   // rpc BundleCreate(BundleCreateRequest) returns (BundleCreateResponse) {}
@@ -8,8 +10,6 @@ service Node {
   // rpc BundlePin(BundlePinRequest) returns(BundlePinResponse) {}
   // rpc BundleSearch(BundleSearchRequest) returns(BundleSearchResponse) {}
   // rpc BundleUnpin(BundleUnpinRequest) returns (BundleUnpinResponse) {}
-  rpc CollectionCreate(CollectionCreateRequest) returns(CollectionCreateResponse) {}
-  rpc CollectionSearch(CollectionSearchRequest) returns(CollectionSearchResponse) {}
   // rpc CollectionUpdate(CollectionUpdateRequest) returns(CollectionUpdateResponse) {}
   // rpc RecordGet(RecordGetRequest) returns (RecordGetResponse) {}
   // rpc Syndicate(SyndicateRequest) returns (SyndicateResponse) {}
@@ -30,6 +30,24 @@ message NodeId {
 
 message CollectionId {
   Pubkey pubkey = 2;
+}
+
+message CollectionSearchRequest {
+  NodeId node_id = 1;
+}
+
+message CollectionSearchResponse {
+  Error error = 1;
+  repeated CollectionId payload = 2;
+}
+
+message CollectionCreateRequest {
+  NodeId node_id = 1;
+}
+
+message CollectionCreateResponse {
+  Error error = 1;
+  CollectionId payload = 2;
 }
 
 // message BundleId {
@@ -61,15 +79,6 @@ message CollectionId {
 //   Hash  hash = 3;
 // }
 
-message CollectionCreateRequest {
-  NodeId node_id = 1;
-}
-
-message CollectionCreateResponse {
-  Error error = 1;
-  CollectionId payload = 2;
-}
-
 // message CollectionUpdateRequest {
 //   CollectionId collection_id = 2;
 //   string name = 3;
@@ -78,15 +87,6 @@ message CollectionCreateResponse {
 // message CollectionUpdateResponse {
 //   Error error = 2;
 // }
-
-message CollectionSearchRequest {
-  NodeId node_id = 1;
-}
-
-message CollectionSearchResponse {
-  Error error = 1;
-  repeated CollectionId collection_ids = 2;
-}
 
 // message BundleCreateRequest {
 //   CollectionId collection_id = 2;

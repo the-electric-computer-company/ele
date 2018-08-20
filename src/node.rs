@@ -3,6 +3,8 @@ use grpc;
 #[allow(unused_imports)]
 use svc::{self, Node as _Node};
 
+use protobuf::RepeatedField;
+
 pub struct Node {
   library: Library,
 }
@@ -59,6 +61,29 @@ impl Node {
   }
 }
 
+impl IntoProtobuf for Vec<api::CollectionId> {
+  type Protobuf = RepeatedField<svc::CollectionId>;
+  fn into_protobuf(self) -> Self::Protobuf {
+    self
+      .into_iter()
+      .map(api::CollectionId::into_protobuf)
+      .collect()
+  }
+}
+
+impl FromProtobuf for Vec<api::CollectionId> {
+  type Protobuf = RepeatedField<svc::CollectionId>;
+
+  type Error = api::Error;
+
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Vec<api::CollectionId>, api::Error> {
+    protobuf
+      .into_iter()
+      .map(api::CollectionId::from_protobuf)
+      .collect::<Result<Vec<api::CollectionId>, api::Error>>()
+  }
+}
+
 impl svc::Node for Node {
   fn collection_create(
     &self,
@@ -72,11 +97,12 @@ impl svc::Node for Node {
 
   fn collection_search(
     &self,
-    _o: ::grpc::RequestOptions,
-    req: svc::CollectionSearchRequest,
+    _options: ::grpc::RequestOptions,
+    request: svc::CollectionSearchRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionSearchResponse> {
-    let resp = self.collection_search_inner(req);
-    grpc::SingleResponse::completed(resp.into_protobuf())
+    let response = self.collection_search_inner(request);
+    let protobuf = response_to_protobuf!(response, svc::CollectionSearchResponse);
+    grpc::SingleResponse::completed(protobuf)
   }
 }
 
@@ -110,24 +136,23 @@ mod tests {
   fn create_req(client: &svc::NodeClient, node_id: NodeId) -> api::CollectionId {
     let create_req = api::CollectionCreateRequest { node_id };
 
-    let (_, resp, _) = client
+    let (_, protobuf, _) = client
       .collection_create(Default::default(), create_req.into_protobuf())
       .wait()
       .unwrap();
-    let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
-    resp.unwrap()
+
+    response_from_protobuf!(protobuf, api::CollectionId).unwrap()
   }
 
   fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<api::CollectionId> {
     let req = api::CollectionSearchRequest { node_id };
 
-    let (_, resp, _) = client
+    let (_, protobuf, _) = client
       .collection_search(Default::default(), req.into_protobuf())
       .wait()
       .unwrap();
 
-    let resp = api::CollectionSearchResponse::from_protobuf(resp).unwrap();
-    resp.unwrap()
+    response_from_protobuf!(protobuf, Vec<api::CollectionId>).unwrap()
   }
 
   #[test]
@@ -156,14 +181,14 @@ mod tests {
 
     let req = api::CollectionCreateRequest { node_id };
 
-    let (_, resp, _) = client
+    let (_, protobuf, _) = client
       .collection_create(Default::default(), req.into_protobuf())
       .wait()
       .unwrap();
 
-    let resp = api::CollectionCreateResponse::from_protobuf(resp).unwrap();
+    let response = response_from_protobuf!(protobuf, api::CollectionId);
 
-    match resp {
+    match response {
       Ok(value) => panic!("expected error: {:?}", value),
       Err(api::Error { kind, .. }) => assert_eq!(kind, api::ErrorKind::WouldProxy),
     }
