@@ -38,14 +38,6 @@ macro_rules! response_from_protobuf {
   ($protobuf:expr, $payload:ty) => {{
     let mut protobuf = $protobuf;
 
-    // if protobuf.has_error() && protobuf.has_payload() {
-    //   unimplemented!()
-    // }
-
-    // if !protobuf.has_error() && !protobuf.has_payload() {
-    //   unimplemented!()
-    // }
-
     if protobuf.has_error() {
       Err(api::Error::from_protobuf(protobuf.take_error()))
     } else {
@@ -98,14 +90,6 @@ pub mod tests {
     assert_eq!(obj2, obj);
   }
 
-  /*
-  #[test]
-  fn response_round_trip() {
-    // test required fields
-    // test round trip
-  }
-  */
-
   #[test]
   fn round_trips() {
     test_round_trip::<Pubkey, svc::Pubkey>();
@@ -113,7 +97,5 @@ pub mod tests {
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
     test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
-    // test_round_trip::<CollectionCreateResponse, svc::CollectionCreateResponse>();
-    // test_round_trip::<CollectionSearchResponse, svc::CollectionSearchResponse>();
   }
 }

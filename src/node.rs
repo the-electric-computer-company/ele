@@ -109,6 +109,7 @@ impl svc::Node for Node {
 #[cfg(test)]
 mod tests {
   use super::*;
+
   fn test_client(port: u16) -> svc::NodeClient {
     let conf = grpc::ClientConf::new();
     svc::NodeClient::new_plain("127.0.0.1", port, conf).unwrap()

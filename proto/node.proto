@@ -29,7 +29,7 @@ message NodeId {
 }
 
 message CollectionId {
-  Pubkey pubkey = 2;
+  Pubkey pubkey = 1;
 }
 
 message CollectionSearchRequest {

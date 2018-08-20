@@ -5,7 +5,7 @@ pub use std::{
   fmt::Debug,
   fs, io, net,
   path::{Path, PathBuf},
-  sync::{Mutex, Once, ONCE_INIT},
+  sync::{Mutex, MutexGuard, Once, ONCE_INIT},
   thread,
 };
 

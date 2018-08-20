@@ -574,7 +574,7 @@ impl CollectionId {
         ::std::default::Default::default()
     }
 
-    // .Pubkey pubkey = 2;
+    // .Pubkey pubkey = 1;
 
     pub fn clear_pubkey(&mut self) {
         self.pubkey.clear();
@@ -622,7 +622,7 @@ impl ::protobuf::Message for CollectionId {
         while !is.eof()? {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
-                2 => {
+                1 => {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.pubkey)?;
                 },
                 _ => {
@@ -648,7 +648,7 @@ impl ::protobuf::Message for CollectionId {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
         if let Some(ref v) = self.pubkey.as_ref() {
-            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
@@ -1561,7 +1561,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x1a\n\x06Pubkey\
     \x12\x10\n\x03key\x18\x01\x20\x01(\x0cR\x03key\")\n\x06NodeId\x12\x1f\n\
     \x06pubkey\x18\x01\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\"/\n\x0cCollectio\
-    nId\x12\x1f\n\x06pubkey\x18\x02\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\";\n\
+    nId\x12\x1f\n\x06pubkey\x18\x01\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\";\n\
     \x17CollectionSearchRequest\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\
     \x07.NodeIdR\x06nodeId\"a\n\x18CollectionSearchResponse\x12\x1c\n\x05err\
     or\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x12'\n\x07payload\x18\x02\

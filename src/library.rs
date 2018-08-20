@@ -110,7 +110,6 @@ impl Library {
     self.initialize_settings()?;
 
     self.create_collections_table()?;
-    // library.create_tables()?;
     Ok(())
   }
 
@@ -182,10 +181,7 @@ impl Library {
 
     let statement = "SELECT collection_pubkey from collections;";
 
-    let lock = self
-      .connection
-      .lock()
-      .expect("library connection lock poisoned");
+    let lock = self.connection();
 
     let mut stmt = lock.prepare(statement).embellish(self, statement)?;
     let rows = stmt.query_map(&[], get).embellish(self, statement)?;
@@ -203,11 +199,16 @@ impl Library {
     Ok(ids)
   }
 
-  fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {
+  fn connection<'a>(&'a self) -> MutexGuard<'a, rusqlite::Connection> {
     self
       .connection
       .lock()
-      .expect("library connection lock poisoned")
+      .expect("library connection mutex poisoned")
+  }
+
+  fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {
+    self
+      .connection()
       .execute(statement, params)
       .embellish(self, statement)
       .map(|_| ())
@@ -223,9 +224,7 @@ impl Library {
     }
 
     self
-      .connection
-      .lock()
-      .expect("library connection lock poisoned")
+      .connection()
       .query_row(statement, &[], get::<T>)
       .embellish(self, statement)
   }
