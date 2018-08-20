@@ -62,11 +62,12 @@ impl Node {
 impl svc::Node for Node {
   fn collection_create(
     &self,
-    _o: ::grpc::RequestOptions,
-    req: svc::CollectionCreateRequest,
+    _options: ::grpc::RequestOptions,
+    request: svc::CollectionCreateRequest,
   ) -> ::grpc::SingleResponse<svc::CollectionCreateResponse> {
-    let resp = self.collection_create_inner(req);
-    grpc::SingleResponse::completed(resp.into_protobuf())
+    let response = self.collection_create_inner(request);
+    let protobuf = response_to_protobuf!(response, svc::CollectionCreateResponse);
+    grpc::SingleResponse::completed(protobuf)
   }
 
   fn collection_search(

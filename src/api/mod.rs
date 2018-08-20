@@ -19,6 +19,41 @@ pub use self::{
   node_id::NodeId,
 };
 
+macro_rules! response_to_protobuf {
+  ($result:expr, $response:ty) => {{
+    let result: Result<_, api::Error> = $result;
+
+    let mut response: $response = Default::default();
+
+    match result {
+      Ok(payload) => response.set_payload(payload.into_protobuf()),
+      Err(error) => response.set_error(error.into_protobuf()),
+    }
+
+    response
+  }};
+}
+
+macro_rules! response_from_protobuf {
+  ($protobuf:expr, $payload:ty) => {{
+    let protobuf = $protobuf;
+
+    if protbuf.has_error() && protobuf.has_payload() {
+      unimplemeted!()
+    }
+
+    if !protobuf.has_error() && !protobuf.has_payload() {
+      unimplemeted!()
+    }
+
+    if protobuf.has_error() {
+      api::Error::from_protobuf(protobuf.take_error())
+    } else {
+      $payload::from_protobuf(protobuf.take_payload())
+    }
+  }};
+}
+
 #[cfg(test)]
 pub mod tests {
   use super::*;

@@ -26,6 +26,7 @@ extern crate uuid;
 #[macro_use]
 mod show;
 
+#[macro_use]
 pub mod api;
 mod common;
 mod error;
@@ -42,18 +43,12 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
-  name = "ele",
-  about = "💾 Share and enjoy",
-  raw(setting = "AppSettings::InferSubcommands")
+  name = "ele", about = "💾 Share and enjoy", raw(setting = "AppSettings::InferSubcommands")
 )]
 enum Opt {
   #[structopt(name = "node")]
   Node {
-    #[structopt(
-      long = "library-path",
-      help = "Set library path",
-      parse(from_os_str)
-    )]
+    #[structopt(long = "library-path", help = "Set library path", parse(from_os_str))]
     library_path: Option<PathBuf>,
   },
 }

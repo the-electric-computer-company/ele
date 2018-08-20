@@ -15,16 +15,10 @@ service Node {
   // rpc Syndicate(SyndicateRequest) returns (SyndicateResponse) {}
 }
 
-// TODO: think about an id scheme with hash(node_id + user_id)
-
 message Error {
   uint32 code = 1;
   string message = 2;
 }
-
-// message RequestId {
-//   bytes request_id = 1;
-// }
 
 message Pubkey {
   bytes key = 1;
@@ -48,12 +42,10 @@ message CollectionId {
 // }
 
 // message ArchiveStreamRequest {
-//   RequestId request_id = 1;
 //   BundleId  bundle_id = 2;
 // }
 
 // message ArchiveStreamResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 //   Hash  hash = 3;
 //   // leaf nodes of merkle tree
@@ -61,12 +53,10 @@ message CollectionId {
 // }
 
 // message ArchiveHashGetRequest {
-//   RequestId request_id = 1;
 //   BundleId  bundle_id = 2;
 // }
 
 // message ArchiveHashGetResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 //   Hash  hash = 3;
 // }
@@ -77,17 +67,15 @@ message CollectionCreateRequest {
 
 message CollectionCreateResponse {
   Error error = 1;
-  CollectionId collection_id = 2;
+  CollectionId payload = 2;
 }
 
 // message CollectionUpdateRequest {
-//   RequestId request_id = 1;
 //   CollectionId collection_id = 2;
 //   string name = 3;
 // }
 
 // message CollectionUpdateResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 // }
 
@@ -101,7 +89,6 @@ message CollectionSearchResponse {
 }
 
 // message BundleCreateRequest {
-//   RequestId request_id = 1;
 //   CollectionId collection_id = 2;
 //   Hash hash = 3;
 //   // tuple of (Record, Archive)
@@ -109,71 +96,58 @@ message CollectionSearchResponse {
 // }
 
 // message BundleCreateResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 //   BundleId bundle_id = 3;
 // }
 
 // message BundleDeleteRequest {
-//   RequestId request_id = 1;
 //   BundleId bundle_id = 2;
 // }
 
 // message BundleDeleteResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 // }
 
 // message SyndicateRequest {
-//   RequestId request_id = 1;
 //   BundleId bundle_id = 2;
 //   CollectionId collection_id = 3;
 // }
 
 // message SyndicateResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 //   BundleId new_bundle_id = 3;
 // }
 
 // message BundleSearchRequest {
-//   RequestId request_id = 1;
 //   CollectionId collection_id = 3;
 // }
 
 // message BundleSearchResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 //   repeated BundleId bundle_ids = 3;
 // }
 
 // message BundlePinRequest {
-//   RequestId request_id = 1;
 //   BundleId bundle_id = 2;
 // }
 
 // message BundlePinResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 // }
 
 // message BundleUnpinRequest {
-//   RequestId request_id = 1;
 //   BundleId bundle_id = 2;
 // }
 
 // message BundleUnpinResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 // }
 
 // message RecordGetRequest {
-//   RequestId request_id = 1;
 //   BundleId bundle_id = 2;
 // }
 
 // message RecordGetResponse {
-//   RequestId request_id = 1;
 //   Error error = 2;
 //   Hash record_hash = 3;
 //   bytes record_data = 4;

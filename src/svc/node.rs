@@ -920,7 +920,7 @@ impl ::protobuf::reflect::ProtobufValue for CollectionCreateRequest {
 pub struct CollectionCreateResponse {
     // message fields
     pub error: ::protobuf::SingularPtrField<Error>,
-    pub collection_id: ::protobuf::SingularPtrField<CollectionId>,
+    pub payload: ::protobuf::SingularPtrField<CollectionId>,
     // special fields
     unknown_fields: ::protobuf::UnknownFields,
     cached_size: ::protobuf::CachedSize,
@@ -964,37 +964,37 @@ impl CollectionCreateResponse {
         self.error.as_ref().unwrap_or_else(|| Error::default_instance())
     }
 
-    // .CollectionId collection_id = 2;
+    // .CollectionId payload = 2;
 
-    pub fn clear_collection_id(&mut self) {
-        self.collection_id.clear();
+    pub fn clear_payload(&mut self) {
+        self.payload.clear();
     }
 
-    pub fn has_collection_id(&self) -> bool {
-        self.collection_id.is_some()
+    pub fn has_payload(&self) -> bool {
+        self.payload.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_collection_id(&mut self, v: CollectionId) {
-        self.collection_id = ::protobuf::SingularPtrField::some(v);
+    pub fn set_payload(&mut self, v: CollectionId) {
+        self.payload = ::protobuf::SingularPtrField::some(v);
     }
 
     // Mutable pointer to the field.
     // If field is not initialized, it is initialized with default value first.
-    pub fn mut_collection_id(&mut self) -> &mut CollectionId {
-        if self.collection_id.is_none() {
-            self.collection_id.set_default();
+    pub fn mut_payload(&mut self) -> &mut CollectionId {
+        if self.payload.is_none() {
+            self.payload.set_default();
         }
-        self.collection_id.as_mut().unwrap()
+        self.payload.as_mut().unwrap()
     }
 
     // Take field
-    pub fn take_collection_id(&mut self) -> CollectionId {
-        self.collection_id.take().unwrap_or_else(|| CollectionId::new())
+    pub fn take_payload(&mut self) -> CollectionId {
+        self.payload.take().unwrap_or_else(|| CollectionId::new())
     }
 
-    pub fn get_collection_id(&self) -> &CollectionId {
-        self.collection_id.as_ref().unwrap_or_else(|| CollectionId::default_instance())
+    pub fn get_payload(&self) -> &CollectionId {
+        self.payload.as_ref().unwrap_or_else(|| CollectionId::default_instance())
     }
 }
 
@@ -1005,7 +1005,7 @@ impl ::protobuf::Message for CollectionCreateResponse {
                 return false;
             }
         };
-        for v in &self.collection_id {
+        for v in &self.payload {
             if !v.is_initialized() {
                 return false;
             }
@@ -1021,7 +1021,7 @@ impl ::protobuf::Message for CollectionCreateResponse {
                     ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.error)?;
                 },
                 2 => {
-                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.collection_id)?;
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.payload)?;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -1039,7 +1039,7 @@ impl ::protobuf::Message for CollectionCreateResponse {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
-        if let Some(ref v) = self.collection_id.as_ref() {
+        if let Some(ref v) = self.payload.as_ref() {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         }
@@ -1054,7 +1054,7 @@ impl ::protobuf::Message for CollectionCreateResponse {
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         }
-        if let Some(ref v) = self.collection_id.as_ref() {
+        if let Some(ref v) = self.payload.as_ref() {
             os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
@@ -1107,9 +1107,9 @@ impl ::protobuf::Message for CollectionCreateResponse {
                     |m: &mut CollectionCreateResponse| { &mut m.error },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<CollectionId>>(
-                    "collection_id",
-                    |m: &CollectionCreateResponse| { &m.collection_id },
-                    |m: &mut CollectionCreateResponse| { &mut m.collection_id },
+                    "payload",
+                    |m: &CollectionCreateResponse| { &m.payload },
+                    |m: &mut CollectionCreateResponse| { &mut m.payload },
                 ));
                 ::protobuf::reflect::MessageDescriptor::new::<CollectionCreateResponse>(
                     "CollectionCreateResponse",
@@ -1134,7 +1134,7 @@ impl ::protobuf::Message for CollectionCreateResponse {
 impl ::protobuf::Clear for CollectionCreateResponse {
     fn clear(&mut self) {
         self.clear_error();
-        self.clear_collection_id();
+        self.clear_payload();
         self.unknown_fields.clear();
     }
 }
@@ -1563,16 +1563,16 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x06pubkey\x18\x01\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\"/\n\x0cCollectio\
     nId\x12\x1f\n\x06pubkey\x18\x02\x20\x01(\x0b2\x07.PubkeyR\x06pubkey\";\n\
     \x17CollectionCreateRequest\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\
-    \x07.NodeIdR\x06nodeId\"l\n\x18CollectionCreateResponse\x12\x1c\n\x05err\
-    or\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x122\n\rcollection_id\x18\
-    \x02\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId\";\n\x17CollectionSea\
-    rchRequest\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\x07.NodeIdR\x06nod\
-    eId\"n\n\x18CollectionSearchResponse\x12\x1c\n\x05error\x18\x01\x20\x01(\
-    \x0b2\x06.ErrorR\x05error\x124\n\x0ecollection_ids\x18\x02\x20\x03(\x0b2\
-    \r.CollectionIdR\rcollectionIds2\x9c\x01\n\x04Node\x12I\n\x10CollectionC\
-    reate\x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\
-    \0\x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.Co\
-    llectionSearchResponse\"\0b\x06proto3\
+    \x07.NodeIdR\x06nodeId\"a\n\x18CollectionCreateResponse\x12\x1c\n\x05err\
+    or\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x12'\n\x07payload\x18\x02\
+    \x20\x01(\x0b2\r.CollectionIdR\x07payload\";\n\x17CollectionSearchReques\
+    t\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"n\n\
+    \x18CollectionSearchResponse\x12\x1c\n\x05error\x18\x01\x20\x01(\x0b2\
+    \x06.ErrorR\x05error\x124\n\x0ecollection_ids\x18\x02\x20\x03(\x0b2\r.Co\
+    llectionIdR\rcollectionIds2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\
+    \x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\
+    \x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.Coll\
+    ectionSearchResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

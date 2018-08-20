@@ -39,7 +39,7 @@ impl FromProtobuf for CollectionCreateResponse {
     let result = if pb_resp.has_error() {
       Err(Error::from_protobuf(pb_resp.take_error()))
     } else {
-      Ok(CollectionId::from_protobuf(pb_resp.take_collection_id())?)
+      Ok(CollectionId::from_protobuf(pb_resp.take_payload())?)
     };
 
     Ok(result)
@@ -52,7 +52,7 @@ impl IntoProtobuf for CollectionCreateResponse {
   fn into_protobuf(self) -> svc::CollectionCreateResponse {
     let mut pb_resp = svc::CollectionCreateResponse::new();
     match self {
-      Ok(id) => pb_resp.set_collection_id(id.into_protobuf()),
+      Ok(id) => pb_resp.set_payload(id.into_protobuf()),
       Err(err) => pb_resp.set_error(err.into_protobuf()),
     }
     pb_resp
@@ -89,7 +89,7 @@ mod tests {
   #[test]
   fn collection_create_response_required_fields() {
     test_required_fields::<CollectionCreateResponse, svc::CollectionCreateResponse>(&[|p| {
-      p.set_collection_id(CollectionId::required_fields().into_protobuf())
+      p.set_payload(CollectionId::required_fields().into_protobuf())
     }])
   }
 }
