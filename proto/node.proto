@@ -50,10 +50,10 @@ message CollectionCreateResponse {
   CollectionId payload = 2;
 }
 
-// message BundleId {
-//  CollectionId collection_id = 1;
-//  bytes bundle_id = 2;
-// }
+message BundleId {
+ CollectionId collection_id = 1;
+ bytes bundle_id = 2;
+}
 
 // message Hash {
 //  bytes hash = 1;

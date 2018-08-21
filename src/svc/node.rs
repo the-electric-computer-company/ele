@@ -1556,6 +1556,226 @@ impl ::protobuf::reflect::ProtobufValue for CollectionCreateResponse {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct BundleId {
+    // message fields
+    pub collection_id: ::protobuf::SingularPtrField<CollectionId>,
+    pub bundle_id: ::std::vec::Vec<u8>,
+    // special fields
+    unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::protobuf::CachedSize,
+}
+
+impl BundleId {
+    pub fn new() -> BundleId {
+        ::std::default::Default::default()
+    }
+
+    // .CollectionId collection_id = 1;
+
+    pub fn clear_collection_id(&mut self) {
+        self.collection_id.clear();
+    }
+
+    pub fn has_collection_id(&self) -> bool {
+        self.collection_id.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_collection_id(&mut self, v: CollectionId) {
+        self.collection_id = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_collection_id(&mut self) -> &mut CollectionId {
+        if self.collection_id.is_none() {
+            self.collection_id.set_default();
+        }
+        self.collection_id.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_collection_id(&mut self) -> CollectionId {
+        self.collection_id.take().unwrap_or_else(|| CollectionId::new())
+    }
+
+    pub fn get_collection_id(&self) -> &CollectionId {
+        self.collection_id.as_ref().unwrap_or_else(|| CollectionId::default_instance())
+    }
+
+    // bytes bundle_id = 2;
+
+    pub fn clear_bundle_id(&mut self) {
+        self.bundle_id.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_bundle_id(&mut self, v: ::std::vec::Vec<u8>) {
+        self.bundle_id = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_bundle_id(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.bundle_id
+    }
+
+    // Take field
+    pub fn take_bundle_id(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.bundle_id, ::std::vec::Vec::new())
+    }
+
+    pub fn get_bundle_id(&self) -> &[u8] {
+        &self.bundle_id
+    }
+}
+
+impl ::protobuf::Message for BundleId {
+    fn is_initialized(&self) -> bool {
+        for v in &self.collection_id {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.collection_id)?;
+                },
+                2 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.bundle_id)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(ref v) = self.collection_id.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        if !self.bundle_id.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(2, &self.bundle_id);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if let Some(ref v) = self.collection_id.as_ref() {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if !self.bundle_id.is_empty() {
+            os.write_bytes(2, &self.bundle_id)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> BundleId {
+        BundleId::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<CollectionId>>(
+                    "collection_id",
+                    |m: &BundleId| { &m.collection_id },
+                    |m: &mut BundleId| { &mut m.collection_id },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "bundle_id",
+                    |m: &BundleId| { &m.bundle_id },
+                    |m: &mut BundleId| { &mut m.bundle_id },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<BundleId>(
+                    "BundleId",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static BundleId {
+        static mut instance: ::protobuf::lazy::Lazy<BundleId> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const BundleId,
+        };
+        unsafe {
+            instance.get(BundleId::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for BundleId {
+    fn clear(&mut self) {
+        self.clear_collection_id();
+        self.clear_bundle_id();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for BundleId {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for BundleId {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\nnode.proto\"5\n\x05Error\x12\x12\n\x04code\x18\x01\x20\x01(\rR\x04co\
     de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x1a\n\x06Pubkey\
@@ -1569,10 +1789,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     t\x12\x20\n\x07node_id\x18\x01\x20\x01(\x0b2\x07.NodeIdR\x06nodeId\"a\n\
     \x18CollectionCreateResponse\x12\x1c\n\x05error\x18\x01\x20\x01(\x0b2\
     \x06.ErrorR\x05error\x12'\n\x07payload\x18\x02\x20\x01(\x0b2\r.Collectio\
-    nIdR\x07payload2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\x12\x18.Co\
-    llectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\x12I\n\x10Col\
-    lectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.CollectionSearchRe\
-    sponse\"\0b\x06proto3\
+    nIdR\x07payload\"[\n\x08BundleId\x122\n\rcollection_id\x18\x01\x20\x01(\
+    \x0b2\r.CollectionIdR\x0ccollectionId\x12\x1b\n\tbundle_id\x18\x02\x20\
+    \x01(\x0cR\x08bundleId2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\x12\
+    \x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\x12I\n\
+    \x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.CollectionS\
+    earchResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {
