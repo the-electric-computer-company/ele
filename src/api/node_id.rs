@@ -15,23 +15,14 @@ impl NodeId {
   }
 }
 
-impl FromProtobuf for NodeId {
-  type Protobuf = svc::NodeId;
-  type Error = Error;
-
-  fn from_protobuf(pb_node_id: svc::NodeId) -> Result<NodeId, Error> {
-    let mut pb_node_id = pb_node_id;
-    let pubkey = Pubkey::from_protobuf(pb_node_id.take_pubkey())?;
-    Ok(NodeId { pubkey })
-  }
-}
-
 impl api::message::Message for NodeId {
   type Protobuf = svc::NodeId;
   type Error = Error;
 
   fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
-    FromProtobuf::from_protobuf(protobuf)
+    let mut protobuf = protobuf;
+    let pubkey = Pubkey::from_protobuf_message(protobuf.take_pubkey())?;
+    Ok(NodeId { pubkey })
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {

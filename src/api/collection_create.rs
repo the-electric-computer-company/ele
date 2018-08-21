@@ -5,23 +5,14 @@ pub struct CollectionCreateRequest {
   pub node_id: NodeId,
 }
 
-impl FromProtobuf for CollectionCreateRequest {
-  type Protobuf = svc::CollectionCreateRequest;
-  type Error = api::Error;
-
-  fn from_protobuf(pb_req: svc::CollectionCreateRequest) -> Result<CollectionCreateRequest, Error> {
-    let mut pb_req = pb_req;
-    let node_id = NodeId::from_protobuf(pb_req.take_node_id())?;
-    Ok(CollectionCreateRequest { node_id })
-  }
-}
-
 impl Message for CollectionCreateRequest {
   type Protobuf = svc::CollectionCreateRequest;
   type Error = api::Error;
 
   fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
-    FromProtobuf::from_protobuf(protobuf)
+    let mut protobuf = protobuf;
+    let node_id = NodeId::from_protobuf_message(protobuf.take_node_id())?;
+    Ok(CollectionCreateRequest { node_id })
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {

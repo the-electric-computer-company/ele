@@ -7,8 +7,6 @@ use rand::{
   Rng,
 };
 
-use api::FromProtobuf;
-
 #[derive(Debug, PartialEq)]
 pub enum Error {
   Length { length: usize },
@@ -46,7 +44,15 @@ impl api::Message for Pubkey {
   type Error = api::Error;
 
   fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
-    FromProtobuf::from_protobuf(protobuf)
+    let bytes = protobuf.get_key().to_vec();
+    if bytes.len() != 16 {
+      return Err(
+        api::ErrorKind::Parse.into_error(format!("invalid pubkey length: {}", bytes.len())),
+      );
+    }
+    let mut pubkey = Pubkey { bytes: [0; 16] };
+    pubkey.bytes.copy_from_slice(bytes.as_slice());
+    Ok(pubkey)
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
@@ -61,23 +67,6 @@ impl api::Message for Pubkey {
   }
 }
 
-impl FromProtobuf for Pubkey {
-  type Protobuf = svc::Pubkey;
-  type Error = api::Error;
-
-  fn from_protobuf(pb_pubkey: Self::Protobuf) -> Result<Pubkey, api::Error> {
-    let bytes = pb_pubkey.get_key().to_vec();
-    if bytes.len() != 16 {
-      return Err(
-        api::ErrorKind::Parse.into_error(format!("invalid pubkey length: {}", bytes.len())),
-      );
-    }
-    let mut pubkey = Pubkey { bytes: [0; 16] };
-    pubkey.bytes.copy_from_slice(bytes.as_slice());
-    Ok(pubkey)
-  }
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -86,11 +75,13 @@ mod tests {
 
   #[test]
   fn bad_pubkey() {
+    use api::Message;
+
     let mut bad_pubkey = svc::Pubkey::new();
     let bad_uuid: Vec<u8> = vec![1, 2, 4];
     bad_pubkey.set_key(bad_uuid);
     assert_eq!(
-      Pubkey::from_protobuf(bad_pubkey)
+      Pubkey::from_protobuf_message(bad_pubkey)
         .expect_err("bad uuid should have caused an error")
         .kind,
       api::ErrorKind::Parse

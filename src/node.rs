@@ -3,9 +3,8 @@ use grpc;
 #[allow(unused_imports)]
 use svc::{self, Node as _Node};
 
-use protobuf::RepeatedField;
-
 use api::Message;
+use protobuf::RepeatedField;
 
 pub struct Node {
   library: Library,
@@ -37,7 +36,7 @@ impl Node {
     &self,
     req: svc::CollectionCreateRequest,
   ) -> Result<api::CollectionId, api::Error> {
-    let req = api::CollectionCreateRequest::from_protobuf(req)?;
+    let req = api::CollectionCreateRequest::from_protobuf_message(req)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
 
@@ -52,7 +51,7 @@ impl Node {
     &self,
     req: svc::CollectionSearchRequest,
   ) -> Result<Vec<api::CollectionId>, api::Error> {
-    let req = api::CollectionSearchRequest::from_protobuf(req)?;
+    let req = api::CollectionSearchRequest::from_protobuf_message(req)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
     if req.node_id == node_id {
@@ -70,7 +69,7 @@ impl Message for Vec<api::CollectionId> {
   fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
     protobuf
       .into_iter()
-      .map(api::CollectionId::from_protobuf)
+      .map(api::CollectionId::from_protobuf_message)
       .collect::<Result<Vec<api::CollectionId>, api::Error>>()
   }
 

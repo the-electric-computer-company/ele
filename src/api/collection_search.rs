@@ -5,23 +5,14 @@ pub struct CollectionSearchRequest {
   pub node_id: NodeId,
 }
 
-impl FromProtobuf for CollectionSearchRequest {
-  type Protobuf = svc::CollectionSearchRequest;
-  type Error = api::Error;
-
-  fn from_protobuf(pb_req: svc::CollectionSearchRequest) -> Result<CollectionSearchRequest, Error> {
-    let mut pb_req = pb_req;
-    let node_id = NodeId::from_protobuf(pb_req.take_node_id())?;
-    Ok(CollectionSearchRequest { node_id })
-  }
-}
-
 impl api::Message for CollectionSearchRequest {
   type Protobuf = svc::CollectionSearchRequest;
   type Error = Error;
 
   fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
-    FromProtobuf::from_protobuf(protobuf)
+    let mut protobuf = protobuf;
+    let node_id = NodeId::from_protobuf_message(protobuf.take_node_id())?;
+    Ok(CollectionSearchRequest { node_id })
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {

@@ -15,23 +15,14 @@ impl CollectionId {
   }
 }
 
-impl FromProtobuf for CollectionId {
-  type Protobuf = svc::CollectionId;
-  type Error = Error;
-
-  fn from_protobuf(pb_collection_id: svc::CollectionId) -> Result<CollectionId, Error> {
-    let mut pb_collection_id = pb_collection_id;
-    let pubkey = Pubkey::from_protobuf(pb_collection_id.take_pubkey())?;
-    Ok(CollectionId { pubkey })
-  }
-}
-
 impl api::Message for CollectionId {
   type Protobuf = svc::CollectionId;
   type Error = Error;
 
   fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
-    FromProtobuf::from_protobuf(protobuf)
+    let mut protobuf = protobuf;
+    let pubkey = Pubkey::from_protobuf_message(protobuf.take_pubkey())?;
+    Ok(CollectionId { pubkey })
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
