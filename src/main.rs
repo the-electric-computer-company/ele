@@ -1,7 +1,11 @@
 #[macro_use]
-extern crate log;
-#[macro_use]
 extern crate structopt;
+
+#[macro_use]
+extern crate log;
+
+#[cfg(test)]
+mod testing;
 
 #[cfg(test)]
 extern crate assert_fs;
@@ -12,7 +16,9 @@ extern crate predicates;
 extern crate env_logger;
 extern crate grpc;
 extern crate protobuf;
+extern crate rand;
 extern crate rusqlite;
+extern crate sha2;
 extern crate tls_api;
 extern crate tls_api_native_tls;
 extern crate uuid;
@@ -20,14 +26,17 @@ extern crate uuid;
 #[macro_use]
 mod show;
 
-#[cfg(test)]
-mod testing;
-
+#[macro_use]
+pub mod api;
+mod collection_id;
 mod common;
+mod default;
 mod error;
 mod library;
 mod node;
+mod node_id;
 mod platform;
+pub mod pubkey;
 mod svc;
 
 use common::*;

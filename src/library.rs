@@ -1,12 +1,16 @@
 use common::*;
 
-use rusqlite::{self, types::FromSql, Connection, Row};
+use rusqlite::{
+  self,
+  types::{FromSql, ToSql},
+  Connection, Row,
+};
 
 const SQLITE_DATABASE_APPLICATION_ID: i32 = 0x1337_0000;
 
 #[derive(Debug)]
 pub struct Library {
-  connection: Connection,
+  connection: Mutex<Connection>,
   database_path: PathBuf,
 }
 
@@ -65,16 +69,16 @@ impl Library {
       }
     }
 
-    let pre_existing = database_path.exists();
+    let new_database = !database_path.exists();
 
-    if pre_existing {
+    if new_database {
       info!(
-        "Opening pre-existing library database at `{}`...",
+        "Creating new library database at `{}`...",
         database_path.display()
       );
     } else {
       info!(
-        "Creating new library database at `{}`...",
+        "Opening pre-existing library database at `{}`...",
         database_path.display()
       );
     }
@@ -87,18 +91,32 @@ impl Library {
       })?;
 
     let library = Library {
-      connection,
+      connection: Mutex::new(connection),
       database_path,
     };
 
-    if pre_existing {
-      library.check_application_id()?;
+    if new_database {
+      library.initialize_database()?;
     } else {
-      library.set_application_id()?;
-      library.set_journal_mode()?;
+      library.check_database()?;
     }
 
     Ok(library)
+  }
+
+  fn initialize_database(&self) -> Result<(), Error> {
+    self.set_application_id()?;
+    self.set_journal_mode()?;
+    self.initialize_settings()?;
+
+    self.create_collections_table()?;
+    Ok(())
+  }
+
+  fn check_database(&self) -> Result<(), Error> {
+    self.check_application_id()?;
+    self.node_id()?;
+    Ok(())
   }
 
   fn application_id(&self) -> Result<i32, Error> {
@@ -121,12 +139,83 @@ impl Library {
     Ok(())
   }
 
-  fn execute(&self, statement: &str) -> Result<(), Error> {
+  fn initialize_settings(&self) -> Result<(), Error> {
+    self.execute("CREATE TABLE settings (node_pubkey BLOB NOT NULL);")?;
+
+    let node_id = NodeId::from_pubkey(random());
+
+    let blob: &[u8] = &node_id.key().bytes;
+
+    self.call("INSERT INTO settings (node_pubkey) VALUES (?1)", &[&blob])?;
+
+    Ok(())
+  }
+
+  pub fn node_id(&self) -> Result<NodeId, Error> {
+    let blob = self.query_scalar::<Vec<u8>>("SELECT node_pubkey FROM settings;")?;
+    Pubkey::from_slice(&blob)
+      .map_err(|pubkey_error| Error::LibraryStoredNodeId { pubkey_error })
+      .map(NodeId::from_pubkey)
+  }
+
+  fn create_collections_table(&self) -> Result<(), Error> {
+    self.execute("CREATE TABLE collections (collection_pubkey BLOB NOT NULL);")?;
+    Ok(())
+  }
+
+  pub fn collection_create(&self) -> Result<CollectionId, Error> {
+    let pubkey: Pubkey = random();
+    let collection_id = CollectionId::from_pubkey(pubkey);
+    let blob: &[u8] = &collection_id.key().bytes;
+    self.call(
+      "INSERT INTO collections (collection_pubkey) VALUES (?1)",
+      &[&blob],
+    )?;
+    Ok(collection_id)
+  }
+
+  pub fn collection_search(&self) -> Result<Vec<CollectionId>, Error> {
+    fn get(row: &Row) -> Vec<u8> {
+      row.get(0)
+    }
+
+    let statement = "SELECT collection_pubkey from collections;";
+
+    let lock = self.connection();
+
+    let mut stmt = lock.prepare(statement).embellish(self, statement)?;
+    let rows = stmt.query_map(&[], get).embellish(self, statement)?;
+
+    let mut ids = vec![];
+    for row in rows {
+      let blob = row.embellish(self, statement)?;
+
+      let id = Pubkey::from_slice(&blob)
+        .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
+        .map(CollectionId::from_pubkey)?;
+      ids.push(id);
+    }
+
+    Ok(ids)
+  }
+
+  fn connection(&self) -> MutexGuard<rusqlite::Connection> {
     self
       .connection
-      .execute(statement, &[])
+      .lock()
+      .expect("library connection mutex poisoned")
+  }
+
+  fn call(&self, statement: &str, params: &[&ToSql]) -> Result<(), Error> {
+    self
+      .connection()
+      .execute(statement, params)
       .embellish(self, statement)
       .map(|_| ())
+  }
+
+  fn execute(&self, statement: &str) -> Result<(), Error> {
+    self.call(statement, &[])
   }
 
   fn query_scalar<T: FromSql>(&self, statement: &str) -> Result<T, Error> {
@@ -135,7 +224,7 @@ impl Library {
     }
 
     self
-      .connection
+      .connection()
       .query_row(statement, &[], get::<T>)
       .embellish(self, statement)
   }
@@ -173,12 +262,28 @@ impl<T> SqliteResultExt<T> for Result<T, rusqlite::Error> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
   use super::*;
 
-  use assert_fs::prelude::*;
-  use assert_fs::TempDir;
   use predicates::prelude::*;
+
+  struct Test {
+    _tempdir: TempDir,
+    library: Library,
+  }
+
+  impl Test {
+    fn new() -> Test {
+      let tempdir = TempDir::new().unwrap();
+      let db = tempdir.child("library.db");
+      let library = Library::with_path(db.path()).unwrap();
+
+      Test {
+        _tempdir: tempdir,
+        library,
+      }
+    }
+  }
 
   #[test]
   fn base_path_correct_suffix() {
@@ -213,14 +318,12 @@ mod test {
   }
 
   #[test]
-  fn creation() {
-    let tempdir = TempDir::new().unwrap();
+  fn initialization() {
+    let Test { library, _tempdir } = Test::new();
 
-    let db = tempdir.child("hello.db");
+    assert!(library.database_path.is_file());
 
-    let library = Library::with_path(db.path()).unwrap();
-
-    db.assert(predicate::path::is_file());
+    library.node_id().unwrap();
 
     assert_eq!(
       library
@@ -228,6 +331,22 @@ mod test {
         .unwrap(),
       "wal"
     );
+  }
+
+  #[test]
+  fn bad_pubkey() {
+    let Test { library, _tempdir } = Test::new();
+
+    library
+      .execute("UPDATE settings SET node_pubkey = x'012345';")
+      .unwrap();
+
+    match library.node_id() {
+      Err(Error::LibraryStoredNodeId { pubkey_error }) => {
+        assert_eq!(pubkey_error, pubkey::Error::Length { length: 3 })
+      }
+      otherwise => panic!("unexpected result: {:?}", otherwise),
+    }
   }
 
   #[test]
@@ -374,5 +493,25 @@ mod test {
         otherwise => panic!("unexpected result: {:?}", otherwise),
       }
     }
+  }
+
+  #[test]
+  fn collection_create() {
+    let tempdir = TempDir::new().unwrap();
+
+    let db = tempdir.child("library.db");
+    let library = Library::with_path(db.path()).unwrap();
+
+    let count = library
+      .query_scalar::<u32>("SELECT count(*) FROM collections")
+      .unwrap();
+    assert_eq!(count, 0);
+
+    let _collection_id = library.collection_create().unwrap();
+
+    let count = library
+      .query_scalar::<u32>("SELECT count(*) FROM collections")
+      .unwrap();
+    assert_eq!(count, 1);
   }
 }

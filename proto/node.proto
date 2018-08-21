@@ -1,178 +1,154 @@
 syntax = "proto3";
 
 service Node {
-  rpc ArchiveHashGet(ArchiveHashGetRequest) returns (ArchiveHashGetResponse) {}
-  rpc ArchiveStream(ArchiveStreamRequest) returns (stream ArchiveStreamResponse) {}
-  rpc BundleCreate(BundleCreateRequest) returns (BundleCreateResponse) {}
-  rpc BundleDelete(BundleDeleteRequest) returns (BundleDeleteResponse) {}
-  rpc BundlePin(BundlePinRequest) returns(BundlePinResponse) {}
-  rpc BundleSearch(BundleSearchRequest) returns(BundleSearchResponse) {}
-  rpc BundleUnpin(BundleUnpinRequest) returns (BundleUnpinResponse) {}
   rpc CollectionCreate(CollectionCreateRequest) returns(CollectionCreateResponse) {}
   rpc CollectionSearch(CollectionSearchRequest) returns(CollectionSearchResponse) {}
-  rpc CollectionUpdate(CollectionUpdateRequest) returns(CollectionUpdateResponse) {}
-  rpc RecordGet(RecordGetRequest) returns (RecordGetResponse) {}
-  rpc Syndicate(SyndicateRequest) returns (SyndicateResponse) {}
+  // rpc ArchiveHashGet(ArchiveHashGetRequest) returns (ArchiveHashGetResponse) {}
+  // rpc ArchiveStream(ArchiveStreamRequest) returns (stream ArchiveStreamResponse) {}
+  // rpc BundleCreate(BundleCreateRequest) returns (BundleCreateResponse) {}
+  // rpc BundleDelete(BundleDeleteRequest) returns (BundleDeleteResponse) {}
+  // rpc BundlePin(BundlePinRequest) returns(BundlePinResponse) {}
+  // rpc BundleSearch(BundleSearchRequest) returns(BundleSearchResponse) {}
+  // rpc BundleUnpin(BundleUnpinRequest) returns (BundleUnpinResponse) {}
+  // rpc CollectionUpdate(CollectionUpdateRequest) returns(CollectionUpdateResponse) {}
+  // rpc RecordGet(RecordGetRequest) returns (RecordGetResponse) {}
+  // rpc Syndicate(SyndicateRequest) returns (SyndicateResponse) {}
 }
-
-// TODO: add request_id to every request
-// TODO: think about an id scheme with hash(node_id + user_id)
 
 message Error {
   uint32 code = 1;
   string message = 2;
 }
 
-message RequestId {
-  bytes request_id = 1;
+message Pubkey {
+  bytes key = 1;
 }
 
-// TODO: fqn of node
-message NodeId {}
-
-// TODO: fqn of node + collection
-// /pubkey/PUBKEY/uuid/UUID ???
-// think about "multikey"
-message CollectionId {}
-
-// TODO: fqn of node + collection + bundle
-message BundleId {}
-
-// TODO: maybe a multihash
-message Hash {}
-
-message ArchiveStreamRequest {
-  RequestId request_id = 1;
-  BundleId  bundle_id = 2;
+message NodeId {
+  Pubkey pubkey = 1;
 }
 
-message ArchiveStreamResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  Hash  hash = 3;
-  // leaf nodes of merkle tree
-  bytes data = 4;
-}
-
-message ArchiveHashGetRequest {
-  RequestId request_id = 1;
-  BundleId  bundle_id = 2;
-}
-
-message ArchiveHashGetResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  Hash  hash = 3;
-}
-
-message CollectionCreateRequest {
-  RequestId request_id = 1;
-  NodeId node_id = 2;
-}
-
-message CollectionCreateResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  CollectionId collection_id = 3;
-}
-
-message CollectionUpdateRequest {
-  RequestId request_id = 1;
-  CollectionId collection_id = 2;
-  string name = 3;
-}
-
-message CollectionUpdateResponse {
-  RequestId request_id = 1;
-  Error error = 2;
+message CollectionId {
+  Pubkey pubkey = 1;
 }
 
 message CollectionSearchRequest {
-  RequestId request_id = 1;
-  NodeId node_id = 2;
+  NodeId node_id = 1;
 }
 
 message CollectionSearchResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  repeated CollectionId collection_ids = 3;
+  Error error = 1;
+  repeated CollectionId payload = 2;
 }
 
-message BundleCreateRequest {
-  RequestId request_id = 1;
-  CollectionId collection_id = 2;
-  Hash hash = 3;
-  // tuple of (Record, Archive)
-  bytes data = 4;
+message CollectionCreateRequest {
+  NodeId node_id = 1;
 }
 
-message BundleCreateResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  BundleId bundle_id = 3;
+message CollectionCreateResponse {
+  Error error = 1;
+  CollectionId payload = 2;
 }
 
-message BundleDeleteRequest {
-  RequestId request_id = 1;
-  BundleId bundle_id = 2;
-}
+// message BundleId {
+//  CollectionId collection_id = 1;
+//  bytes bundle_id = 2;
+// }
 
-message BundleDeleteResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-}
+// message Hash {
+//  bytes hash = 1;
+// }
 
-message SyndicateRequest {
-  RequestId request_id = 1;
-  BundleId bundle_id = 2;
-  CollectionId collection_id = 3;
-}
+// message ArchiveStreamRequest {
+//   BundleId  bundle_id = 2;
+// }
 
-message SyndicateResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  BundleId new_bundle_id = 3;
-}
+// message ArchiveStreamResponse {
+//   Error error = 2;
+//   Hash  hash = 3;
+//   // leaf nodes of merkle tree
+//   bytes data = 4;
+// }
 
-message BundleSearchRequest {
-  RequestId request_id = 1;
-  CollectionId collection_id = 3;
-}
+// message ArchiveHashGetRequest {
+//   BundleId  bundle_id = 2;
+// }
 
-message BundleSearchResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  repeated BundleId bundle_ids = 3;
-}
+// message ArchiveHashGetResponse {
+//   Error error = 2;
+//   Hash  hash = 3;
+// }
 
-message BundlePinRequest {
-  RequestId request_id = 1;
-  BundleId bundle_id = 2;
-}
+// message CollectionUpdateRequest {
+//   CollectionId collection_id = 2;
+//   string name = 3;
+// }
 
-message BundlePinResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-}
+// message CollectionUpdateResponse {
+//   Error error = 2;
+// }
 
-message BundleUnpinRequest {
-  RequestId request_id = 1;
-  BundleId bundle_id = 2;
-}
+// message BundleCreateRequest {
+//   CollectionId collection_id = 2;
+//   Hash hash = 3;
+//   // tuple of (Record, Archive)
+//   bytes data = 4;
+// }
 
-message BundleUnpinResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-}
+// message BundleCreateResponse {
+//   Error error = 2;
+//   BundleId bundle_id = 3;
+// }
 
-message RecordGetRequest {
-  RequestId request_id = 1;
-  BundleId bundle_id = 2;
-}
+// message BundleDeleteRequest {
+//   BundleId bundle_id = 2;
+// }
 
-message RecordGetResponse {
-  RequestId request_id = 1;
-  Error error = 2;
-  Hash record_hash = 3;
-  bytes record_data = 4;
-}
+// message BundleDeleteResponse {
+//   Error error = 2;
+// }
+
+// message SyndicateRequest {
+//   BundleId bundle_id = 2;
+//   CollectionId collection_id = 3;
+// }
+
+// message SyndicateResponse {
+//   Error error = 2;
+//   BundleId new_bundle_id = 3;
+// }
+
+// message BundleSearchRequest {
+//   CollectionId collection_id = 3;
+// }
+
+// message BundleSearchResponse {
+//   Error error = 2;
+//   repeated BundleId bundle_ids = 3;
+// }
+
+// message BundlePinRequest {
+//   BundleId bundle_id = 2;
+// }
+
+// message BundlePinResponse {
+//   Error error = 2;
+// }
+
+// message BundleUnpinRequest {
+//   BundleId bundle_id = 2;
+// }
+
+// message BundleUnpinResponse {
+//   Error error = 2;
+// }
+
+// message RecordGetRequest {
+//   BundleId bundle_id = 2;
+// }
+
+// message RecordGetResponse {
+//   Error error = 2;
+//   Hash record_hash = 3;
+//   bytes record_data = 4;
+// }

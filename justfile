@@ -1,13 +1,15 @@
 # default to `test`
 default: test
 
-log='warn'
+log='off'
 
 bt='0'
 
 version = `head -3 Cargo.toml | sed -En 's/^version[[:space:]]*=[[:space:]]*"([^"]+)"/v\1/p'`
 
 export RUST_BACKTRACE = bt
+
+export RUST_LOG = "ele=" + log
 
 # run tests
 test:
@@ -20,9 +22,9 @@ fmt:
 # run linter
 @lint:
 	echo Checking for TODO/FIX/XXX...
-	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src 
+	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src
 	echo Checking for lines over 100 columns...
-	! grep --color -Ern --exclude-dir=src/svc '.{101}' src
+	! rg --glob '!src/svc' '.{101}' src
 	echo Invoking clippy...
 	cargo +nightly clippy -- \
 		-D clippy \
@@ -35,7 +37,7 @@ fmt:
 doc:
 	cargo rustdoc --open -- --document-private-items
 
-# watch for changes and run `cargo fmt` and `cargo check`
+# watch for changes and run tests on changes
 watch:
 	cargo watch --ignore 'src/svc/*' --clear --exec test
 
@@ -64,14 +66,18 @@ pr: fmt lint test assert-clean
 run command='node': build
 	RUST_LOG={{log}} ./target/debug/ele {{command}}
 
+replace FROM TO:
+	find src -name '*.rs' | xargs sed -i '' -E 's/{{FROM}}/{{TO}}/g'
+
 # install development dependencies
 install-dev-deps:
 	# for `lint` recipe
 	rustup component add clippy-preview --toolchain=nightly
+	cargo install ripgrep || true
 	# for `fmt` recipe
 	rustup component add rustfmt-preview
 	# for `watch` recipe
-	cargo install cargo-watch 
+	cargo install cargo-watch || true
 
 # install development dependencies using homebrew
 install-dev-deps-homebrew:
