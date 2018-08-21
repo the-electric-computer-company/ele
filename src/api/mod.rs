@@ -97,7 +97,7 @@ pub mod tests {
     // test_round_trip::<Pubkey, svc::Pubkey>();
     // test_round_trip::<NodeId, svc::NodeId>();
     // test_round_trip::<CollectionId, svc::CollectionId>();
-    test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+    // test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
     // test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
   }
 
@@ -113,7 +113,7 @@ pub mod tests {
     test_round_trip_message::<Pubkey, svc::Pubkey>();
     test_round_trip_message::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
-    // test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
     test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
   }
 }

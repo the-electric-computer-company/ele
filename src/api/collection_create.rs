@@ -26,6 +26,24 @@ impl IntoProtobuf for CollectionCreateRequest {
   }
 }
 
+impl Message for CollectionCreateRequest {
+  type Protobuf = svc::CollectionCreateRequest;
+  type Error = api::Error;
+
+  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+    FromProtobuf::from_protobuf(protobuf)
+  }
+
+  fn into_protobuf_message(self) -> Self::Protobuf {
+    self.into_protobuf()
+  }
+
+  #[cfg(test)]
+  fn required_fields_message() -> Self {
+    api::tests::RequiredFields::required_fields()
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
