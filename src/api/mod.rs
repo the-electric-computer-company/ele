@@ -98,7 +98,7 @@ pub mod tests {
     // test_round_trip::<NodeId, svc::NodeId>();
     // test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
-    test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    // test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
   }
 
   fn test_round_trip_message<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
@@ -114,6 +114,6 @@ pub mod tests {
     test_round_trip_message::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
     // test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
-    // test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
   }
 }

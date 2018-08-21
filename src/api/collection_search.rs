@@ -26,6 +26,27 @@ impl IntoProtobuf for CollectionSearchRequest {
   }
 }
 
+impl api::Message for CollectionSearchRequest {
+  type Protobuf = svc::CollectionSearchRequest;
+  type Error = Error;
+
+  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+    FromProtobuf::from_protobuf(protobuf)
+  }
+
+  fn into_protobuf_message(self) -> Self::Protobuf {
+    self.into_protobuf()
+  }
+
+  #[cfg(test)]
+  fn required_fields_message() -> Self {
+    use api::tests::RequiredFields;
+
+    let node_id = NodeId::required_fields();
+    CollectionSearchRequest { node_id: node_id }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
