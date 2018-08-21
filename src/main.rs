@@ -29,6 +29,7 @@ mod show;
 #[macro_use]
 pub mod api;
 mod common;
+mod default;
 mod error;
 mod library;
 mod node;

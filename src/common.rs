@@ -3,7 +3,7 @@ pub use std::{
   env,
   ffi::OsStr,
   fmt::Debug,
-  fs, io, net,
+  fs, io, iter, net,
   path::{Path, PathBuf},
   sync::{Mutex, MutexGuard, Once, ONCE_INIT},
   thread,
@@ -13,6 +13,7 @@ pub use rand::random;
 
 pub use api::FromProtobuf;
 pub use api::{self, NodeId};
+pub use default::default;
 pub use error::Error;
 pub use library::Library;
 pub use node::Node;

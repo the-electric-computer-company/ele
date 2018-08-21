@@ -23,7 +23,7 @@ macro_rules! response_to_protobuf {
   ($result:expr, $response:ty) => {{
     let result: Result<_, api::Error> = $result;
 
-    let mut response: $response = Default::default();
+    let mut response: $response = default();
 
     match result {
       Ok(payload) => response.set_payload(payload.into_protobuf_message()),
@@ -54,7 +54,7 @@ pub mod tests {
     setters: &[fn(&mut P)],
   ) {
     for i in 0..setters.len() {
-      let mut victim = Default::default();
+      let mut victim = default();
       for (j, setter) in setters.iter().enumerate() {
         if j == i {
           continue;
@@ -64,7 +64,7 @@ pub mod tests {
       T::from_protobuf_message(victim).expect_err("it worked");
     }
 
-    let mut p = Default::default();
+    let mut p = default();
     for setter in setters {
       setter(&mut p)
     }

@@ -82,7 +82,7 @@ impl Message for Vec<api::CollectionId> {
 
   #[cfg(test)]
   fn required_fields_message() -> Self {
-    unimplemented!()
+    Vec::new()
   }
 }
 
