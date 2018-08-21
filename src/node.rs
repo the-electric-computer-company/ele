@@ -36,7 +36,7 @@ impl Node {
     &self,
     req: svc::CollectionCreateRequest,
   ) -> Result<api::CollectionId, api::Error> {
-    let req = api::CollectionCreateRequest::from_protobuf_message(req)?;
+    let req = api::CollectionCreateRequest::from_protobuf(req)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
 
@@ -51,7 +51,7 @@ impl Node {
     &self,
     req: svc::CollectionSearchRequest,
   ) -> Result<Vec<api::CollectionId>, api::Error> {
-    let req = api::CollectionSearchRequest::from_protobuf_message(req)?;
+    let req = api::CollectionSearchRequest::from_protobuf(req)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
     if req.node_id == node_id {
@@ -66,22 +66,22 @@ impl Message for Vec<api::CollectionId> {
   type Protobuf = RepeatedField<svc::CollectionId>;
   type Error = api::Error;
 
-  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
     protobuf
       .into_iter()
-      .map(api::CollectionId::from_protobuf_message)
+      .map(api::CollectionId::from_protobuf)
       .collect::<Result<Vec<api::CollectionId>, api::Error>>()
   }
 
-  fn into_protobuf_message(self) -> Self::Protobuf {
+  fn into_protobuf(self) -> Self::Protobuf {
     self
       .into_iter()
-      .map(api::CollectionId::into_protobuf_message)
+      .map(api::CollectionId::into_protobuf)
       .collect()
   }
 
   #[cfg(test)]
-  fn required_fields_message() -> Self {
+  fn required_fields() -> Self {
     Vec::new()
   }
 }
@@ -140,7 +140,7 @@ mod tests {
     let create_req = api::CollectionCreateRequest { node_id };
 
     let (_, protobuf, _) = client
-      .collection_create(Default::default(), create_req.into_protobuf_message())
+      .collection_create(Default::default(), create_req.into_protobuf())
       .wait()
       .unwrap();
 
@@ -151,7 +151,7 @@ mod tests {
     let req = api::CollectionSearchRequest { node_id };
 
     let (_, protobuf, _) = client
-      .collection_search(Default::default(), req.into_protobuf_message())
+      .collection_search(Default::default(), req.into_protobuf())
       .wait()
       .unwrap();
 
@@ -185,7 +185,7 @@ mod tests {
     let req = api::CollectionCreateRequest { node_id };
 
     let (_, protobuf, _) = client
-      .collection_create(Default::default(), req.into_protobuf_message())
+      .collection_create(Default::default(), req.into_protobuf())
       .wait()
       .unwrap();
 

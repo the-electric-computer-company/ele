@@ -43,7 +43,7 @@ impl api::Message for Pubkey {
   type Protobuf = svc::Pubkey;
   type Error = api::Error;
 
-  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
     let bytes = protobuf.get_key().to_vec();
     if bytes.len() != 16 {
       return Err(
@@ -55,14 +55,14 @@ impl api::Message for Pubkey {
     Ok(pubkey)
   }
 
-  fn into_protobuf_message(self) -> Self::Protobuf {
+  fn into_protobuf(self) -> Self::Protobuf {
     let mut protobuf = svc::Pubkey::new();
     protobuf.set_key((&self.bytes[..]).to_vec());
     protobuf
   }
 
   #[cfg(test)]
-  fn required_fields_message() -> Self {
+  fn required_fields() -> Self {
     random()
   }
 }
@@ -81,7 +81,7 @@ mod tests {
     let bad_uuid: Vec<u8> = vec![1, 2, 4];
     bad_pubkey.set_key(bad_uuid);
     assert_eq!(
-      Pubkey::from_protobuf_message(bad_pubkey)
+      Pubkey::from_protobuf(bad_pubkey)
         .expect_err("bad uuid should have caused an error")
         .kind,
       api::ErrorKind::Parse

@@ -22,7 +22,7 @@ fmt:
 # run linter
 @lint:
 	echo Checking for TODO/FIX/XXX...
-	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src 
+	! grep --color -Ern --exclude-dir=src/svc 'TODO|FIX|XXX' src
 	echo Checking for lines over 100 columns...
 	! rg --glob '!src/svc' '.{101}' src
 	echo Invoking clippy...
@@ -65,6 +65,9 @@ pr: fmt lint test assert-clean
 # run a command, defaulting to `node`
 run command='node': build
 	RUST_LOG={{log}} ./target/debug/ele {{command}}
+
+replace FROM TO:
+	find src -name '*.rs' | xargs sed -i '' -E 's/{{FROM}}/{{TO}}/g'
 
 # install development dependencies
 install-dev-deps:

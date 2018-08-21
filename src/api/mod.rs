@@ -5,7 +5,6 @@ mod collection_create;
 mod collection_id;
 mod collection_search;
 mod error;
-mod from_protobuf;
 mod message;
 mod node_id;
 
@@ -14,7 +13,6 @@ pub use self::{
   collection_id::CollectionId,
   collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
-  from_protobuf::FromProtobuf,
   message::Message,
   node_id::NodeId,
 };
@@ -26,7 +24,7 @@ macro_rules! response_to_protobuf {
     let mut response: $response = default();
 
     match result {
-      Ok(payload) => response.set_payload(payload.into_protobuf_message()),
+      Ok(payload) => response.set_payload(payload.into_protobuf()),
       Err(error) => response.set_error(error.into_protobuf()),
     }
 
@@ -41,7 +39,7 @@ macro_rules! response_from_protobuf {
     if protobuf.has_error() {
       Err(api::Error::from_protobuf(protobuf.take_error()))
     } else {
-      <$payload>::from_protobuf_message(protobuf.take_payload())
+      <$payload>::from_protobuf(protobuf.take_payload())
     }
   }};
 }
@@ -61,20 +59,20 @@ pub mod tests {
         }
         setter(&mut victim);
       }
-      T::from_protobuf_message(victim).expect_err("it worked");
+      T::from_protobuf(victim).expect_err("it worked");
     }
 
     let mut p = default();
     for setter in setters {
       setter(&mut p)
     }
-    T::from_protobuf_message(p).expect("parsing failed when all required fields were present");
+    T::from_protobuf(p).expect("parsing failed when all required fields were present");
   }
 
   fn test_round_trip_message<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
-    let obj = T::required_fields_message();
-    let pb = obj.clone().into_protobuf_message();
-    let obj2 = T::from_protobuf_message(pb).unwrap();
+    let obj = T::required_fields();
+    let pb = obj.clone().into_protobuf();
+    let obj2 = T::from_protobuf(pb).unwrap();
     assert_eq!(obj2, obj);
   }
 
