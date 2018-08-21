@@ -8,5 +8,5 @@ pub trait Message: Sized {
   fn into_protobuf(self) -> Self::Protobuf;
 
   #[cfg(test)]
-  fn required_fields() -> Self;
+  fn new_valid_test_instance() -> Self;
 }

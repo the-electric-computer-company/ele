@@ -20,8 +20,8 @@ impl Message for NodeId {
   }
 
   #[cfg(test)]
-  fn required_fields() -> Self {
-    NodeId::from_pubkey(Pubkey::required_fields())
+  fn new_valid_test_instance() -> Self {
+    NodeId::from_pubkey(Pubkey::new_valid_test_instance())
   }
 }
 
@@ -32,7 +32,7 @@ mod tests {
   use api::tests::*;
 
   #[test]
-  fn node_id_required_fields() {
+  fn node_id_new_valid_test_instance() {
     test_required_fields::<NodeId, svc::NodeId>(&[|p| {
       p.set_pubkey(random::<Pubkey>().into_protobuf())
     }])

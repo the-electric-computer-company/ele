@@ -61,7 +61,7 @@ impl api::Message for Pubkey {
   }
 
   #[cfg(test)]
-  fn required_fields() -> Self {
+  fn new_valid_test_instance() -> Self {
     random()
   }
 }
@@ -88,7 +88,7 @@ mod tests {
   }
 
   #[test]
-  fn pubkey_required_fields() {
+  fn pubkey_new_valid_test_instance() {
     test_required_fields::<Pubkey, svc::Pubkey>(&[|p| p.set_key(random::<Pubkey>().bytes.to_vec())])
   }
 }

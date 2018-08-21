@@ -1,4 +1,4 @@
-use super::*;
+use svc;
 
 const ERROR_PARSE: u32 = 1;
 const ERROR_WOULD_PROXY: u32 = 2;

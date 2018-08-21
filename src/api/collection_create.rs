@@ -1,4 +1,7 @@
-use super::*;
+use common::*;
+
+use api::Message;
+use svc;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct CollectionCreateRequest {
@@ -21,8 +24,8 @@ impl Message for CollectionCreateRequest {
   }
 
   #[cfg(test)]
-  fn required_fields() -> Self {
-    let node_id = NodeId::required_fields();
+  fn new_valid_test_instance() -> Self {
+    let node_id = NodeId::new_valid_test_instance();
     CollectionCreateRequest { node_id }
   }
 }
@@ -31,12 +34,12 @@ impl Message for CollectionCreateRequest {
 mod tests {
   use super::*;
 
-  use super::super::tests::*;
+  use api::tests::*;
 
   #[test]
-  fn collection_create_request_required_fields() {
+  fn collection_create_request_new_valid_test_instance() {
     test_required_fields::<CollectionCreateRequest, svc::CollectionCreateRequest>(&[|p| {
-      p.set_node_id(NodeId::required_fields().into_protobuf())
+      p.set_node_id(NodeId::new_valid_test_instance().into_protobuf())
     }])
   }
 }

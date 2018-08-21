@@ -19,9 +19,9 @@ impl Message for CollectionId {
   }
 
   #[cfg(test)]
-  fn required_fields() -> Self {
+  fn new_valid_test_instance() -> Self {
     CollectionId {
-      pubkey: Pubkey::required_fields(),
+      pubkey: Pubkey::new_valid_test_instance(),
     }
   }
 }
@@ -33,9 +33,9 @@ mod tests {
   use api::tests::*;
 
   #[test]
-  fn collection_id_required_fields() {
+  fn collection_id_new_valid_test_instance() {
     test_required_fields::<CollectionId, svc::CollectionId>(&[|p| {
-      p.set_pubkey(Pubkey::required_fields().into_protobuf())
+      p.set_pubkey(Pubkey::new_valid_test_instance().into_protobuf())
     }])
   }
 }

@@ -4,7 +4,6 @@ use grpc;
 use svc::{self, Node as _Node};
 
 use api::Message;
-use protobuf::RepeatedField;
 
 pub struct Node {
   library: Library,
@@ -59,26 +58,6 @@ impl Node {
     } else {
       Err(api::ErrorKind::WouldProxy.into_error("proxy not implemented"))
     }
-  }
-}
-
-impl Message for Vec<CollectionId> {
-  type Protobuf = RepeatedField<svc::CollectionId>;
-
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
-    protobuf
-      .into_iter()
-      .map(CollectionId::from_protobuf)
-      .collect::<Result<Vec<CollectionId>, api::Error>>()
-  }
-
-  fn into_protobuf(self) -> Self::Protobuf {
-    self.into_iter().map(CollectionId::into_protobuf).collect()
-  }
-
-  #[cfg(test)]
-  fn required_fields() -> Self {
-    Vec::new()
   }
 }
 

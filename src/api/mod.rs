@@ -7,6 +7,7 @@ mod collection_search;
 mod error;
 mod message;
 mod node_id;
+mod repeated;
 
 pub use self::{
   collection_create::CollectionCreateRequest,
@@ -68,7 +69,7 @@ pub mod tests {
   }
 
   fn test_round_trip<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
-    let obj = T::required_fields();
+    let obj = T::new_valid_test_instance();
     let pb = obj.clone().into_protobuf();
     let obj2 = T::from_protobuf(pb).unwrap();
     assert_eq!(obj2, obj);
@@ -87,7 +88,7 @@ pub mod tests {
     (name: $name:ident,payload: $payload:ty,response: $response:ty,) => {
       #[test]
       fn $name() {
-        let input = Ok(<$payload>::required_fields());
+        let input = Ok(<$payload>::new_valid_test_instance());
         let protobuf = response_to_protobuf!(input.clone(), $response);
         let output = response_from_protobuf!(protobuf, $payload);
         assert_eq!(input, output);
