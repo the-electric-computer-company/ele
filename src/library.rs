@@ -199,7 +199,7 @@ impl Library {
     Ok(ids)
   }
 
-  fn connection<'a>(&'a self) -> MutexGuard<'a, rusqlite::Connection> {
+  fn connection(&self) -> MutexGuard<rusqlite::Connection> {
     self
       .connection
       .lock()

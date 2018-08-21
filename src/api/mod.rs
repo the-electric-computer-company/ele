@@ -1,6 +1,3 @@
-use common::*;
-use svc;
-
 mod collection_create;
 mod collection_id;
 mod collection_search;
@@ -31,6 +28,7 @@ macro_rules! response_to_protobuf {
   }};
 }
 
+#[cfg(test)]
 macro_rules! response_from_protobuf {
   ($protobuf:expr, $payload:ty) => {{
     let mut protobuf = $protobuf;
@@ -46,6 +44,9 @@ macro_rules! response_from_protobuf {
 #[cfg(test)]
 pub mod tests {
   use super::*;
+
+  use common::*;
+  use svc;
 
   pub fn test_required_fields<T: Message<Protobuf = P> + Debug, P: Default>(
     setters: &[fn(&mut P)],
