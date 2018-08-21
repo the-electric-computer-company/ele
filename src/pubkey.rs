@@ -91,12 +91,6 @@ mod tests {
 
   use api::tests::*;
 
-  impl RequiredFields for Pubkey {
-    fn required_fields() -> Pubkey {
-      random()
-    }
-  }
-
   #[test]
   fn bad_pubkey() {
     let mut bad_pubkey = svc::Pubkey::new();

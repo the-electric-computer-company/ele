@@ -20,9 +20,9 @@ impl IntoProtobuf for CollectionCreateRequest {
   type Protobuf = svc::CollectionCreateRequest;
 
   fn into_protobuf(self) -> svc::CollectionCreateRequest {
-    let mut pb_req = svc::CollectionCreateRequest::new();
-    pb_req.set_node_id(self.node_id.into_protobuf());
-    pb_req
+    let mut protobuf = svc::CollectionCreateRequest::new();
+    protobuf.set_node_id(self.node_id.into_protobuf_message());
+    protobuf
   }
 }
 
@@ -40,7 +40,8 @@ impl Message for CollectionCreateRequest {
 
   #[cfg(test)]
   fn required_fields_message() -> Self {
-    api::tests::RequiredFields::required_fields()
+    let node_id = NodeId::required_fields_message();
+    CollectionCreateRequest { node_id }
   }
 }
 
@@ -50,16 +51,10 @@ mod tests {
 
   use super::super::tests::*;
 
-  impl RequiredFields for CollectionCreateRequest {
-    fn required_fields() -> CollectionCreateRequest {
-      let node_id = NodeId::required_fields();
-      CollectionCreateRequest { node_id }
-    }
-  }
   #[test]
   fn collection_create_request_required_fields() {
     test_required_fields::<CollectionCreateRequest, svc::CollectionCreateRequest>(&[|p| {
-      p.set_node_id(NodeId::required_fields().into_protobuf())
+      p.set_node_id(NodeId::required_fields_message().into_protobuf_message())
     }])
   }
 }

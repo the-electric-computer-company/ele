@@ -50,10 +50,8 @@ impl api::Message for CollectionId {
 
   #[cfg(test)]
   fn required_fields_message() -> Self {
-    use api::tests::RequiredFields;
-
     CollectionId {
-      pubkey: Pubkey::required_fields(),
+      pubkey: Pubkey::required_fields_message(),
     }
   }
 }
@@ -64,18 +62,10 @@ mod tests {
 
   use super::super::tests::*;
 
-  impl RequiredFields for CollectionId {
-    fn required_fields() -> CollectionId {
-      CollectionId {
-        pubkey: Pubkey::required_fields(),
-      }
-    }
-  }
-
   #[test]
   fn collection_id_required_fields() {
     test_required_fields::<CollectionId, svc::CollectionId>(&[|p| {
-      p.set_pubkey(Pubkey::required_fields().into_protobuf())
+      p.set_pubkey(Pubkey::required_fields_message().into_protobuf())
     }])
   }
 }

@@ -52,11 +52,7 @@ macro_rules! response_from_protobuf {
 pub mod tests {
   use super::*;
 
-  pub trait RequiredFields {
-    fn required_fields() -> Self;
-  }
-
-  pub fn test_required_fields<T: FromProtobuf<Protobuf = P> + Debug, P: Default>(
+  pub fn test_required_fields<T: Message<Protobuf = P> + Debug, P: Default>(
     setters: &[fn(&mut P)],
   ) {
     for i in 0..setters.len() {
@@ -67,38 +63,14 @@ pub mod tests {
         }
         setter(&mut victim);
       }
-      T::from_protobuf(victim).expect_err("it worked");
+      T::from_protobuf_message(victim).expect_err("it worked");
     }
 
     let mut p = Default::default();
     for setter in setters {
       setter(&mut p)
     }
-    T::from_protobuf(p).expect("parsing failed when all required fields were present");
-  }
-
-  fn test_round_trip<
-    T: RequiredFields
-      + FromProtobuf<Protobuf = P>
-      + IntoProtobuf<Protobuf = P>
-      + Clone
-      + Debug
-      + PartialEq,
-    P,
-  >() {
-    let obj = T::required_fields();
-    let pb = obj.clone().into_protobuf();
-    let obj2 = T::from_protobuf(pb).unwrap();
-    assert_eq!(obj2, obj);
-  }
-
-  #[test]
-  fn round_trips() {
-    // test_round_trip::<Pubkey, svc::Pubkey>();
-    // test_round_trip::<NodeId, svc::NodeId>();
-    // test_round_trip::<CollectionId, svc::CollectionId>();
-    // test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
-    // test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    T::from_protobuf_message(p).expect("parsing failed when all required fields were present");
   }
 
   fn test_round_trip_message<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
@@ -112,8 +84,8 @@ pub mod tests {
   fn round_trips_message() {
     test_round_trip_message::<Pubkey, svc::Pubkey>();
     test_round_trip_message::<NodeId, svc::NodeId>();
-    test_round_trip::<CollectionId, svc::CollectionId>();
-    test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
-    test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+    test_round_trip_message::<CollectionId, svc::CollectionId>();
+    test_round_trip_message::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    test_round_trip_message::<CollectionCreateRequest, svc::CollectionCreateRequest>();
   }
 }

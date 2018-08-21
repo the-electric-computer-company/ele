@@ -26,16 +26,6 @@ impl FromProtobuf for NodeId {
   }
 }
 
-impl IntoProtobuf for NodeId {
-  type Protobuf = svc::NodeId;
-
-  fn into_protobuf(self) -> svc::NodeId {
-    let mut pb_node_id = svc::NodeId::new();
-    pb_node_id.set_pubkey(self.key().into_protobuf());
-    pb_node_id
-  }
-}
-
 impl api::message::Message for NodeId {
   type Protobuf = svc::NodeId;
   type Error = Error;
@@ -45,15 +35,15 @@ impl api::message::Message for NodeId {
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
-    self.into_protobuf()
+    let mut protobuf = svc::NodeId::new();
+    protobuf.set_pubkey(self.key().into_protobuf_message());
+    protobuf
   }
 
   #[cfg(test)]
   fn required_fields_message() -> Self {
-    use api::tests::RequiredFields;
-
     NodeId {
-      pubkey: Pubkey::required_fields(),
+      pubkey: Pubkey::required_fields_message(),
     }
   }
 }
@@ -63,14 +53,6 @@ mod tests {
   use super::*;
 
   use super::super::tests::*;
-
-  impl RequiredFields for NodeId {
-    fn required_fields() -> NodeId {
-      NodeId {
-        pubkey: Pubkey::required_fields(),
-      }
-    }
-  }
 
   #[test]
   fn node_id_required_fields() {
