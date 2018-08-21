@@ -1,6 +1,6 @@
 use common::*;
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub struct BundleId {
   collection_id: CollectionId,
   id: [u8; 16],
@@ -17,7 +17,7 @@ impl BundleId {
   }
 
   pub fn collection_id(&self) -> CollectionId {
-    self.collection_id.clone()
+    self.collection_id
   }
 
   pub fn id(&self) -> [u8; 16] {
