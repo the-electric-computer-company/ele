@@ -67,7 +67,7 @@ pub mod tests {
     T::from_protobuf(p).expect("parsing failed when all required fields were present");
   }
 
-  fn test_round_trip_message<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
+  fn test_round_trip<T: Message<Protobuf = P> + Clone + Debug + PartialEq, P>() {
     let obj = T::required_fields();
     let pb = obj.clone().into_protobuf();
     let obj2 = T::from_protobuf(pb).unwrap();
@@ -75,11 +75,40 @@ pub mod tests {
   }
 
   #[test]
-  fn round_trips_message() {
-    test_round_trip_message::<Pubkey, svc::Pubkey>();
-    test_round_trip_message::<NodeId, svc::NodeId>();
-    test_round_trip_message::<CollectionId, svc::CollectionId>();
-    test_round_trip_message::<CollectionSearchRequest, svc::CollectionSearchRequest>();
-    test_round_trip_message::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+  fn round_trips() {
+    test_round_trip::<Pubkey, svc::Pubkey>();
+    test_round_trip::<NodeId, svc::NodeId>();
+    test_round_trip::<CollectionId, svc::CollectionId>();
+    test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
+    test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+  }
+
+  macro_rules! round_trip_response_test {
+    (name: $name:ident,payload: $payload:ty,response: $response:ty,) => {
+      #[test]
+      fn $name() {
+        let input = Ok(<$payload>::required_fields());
+        let protobuf = response_to_protobuf!(input.clone(), $response);
+        let output = response_from_protobuf!(protobuf, $payload);
+        assert_eq!(input, output);
+
+        let input: Result<$payload, _> = Err(ErrorKind::Parse.into_error("bad message"));
+        let protobuf = response_to_protobuf!(input.clone(), $response);
+        let output = response_from_protobuf!(protobuf, $payload);
+        assert_eq!(input, output);
+      }
+    };
+  }
+
+  round_trip_response_test! {
+    name:     collection_create_response,
+    payload:  CollectionId,
+    response: svc::CollectionCreateResponse,
+  }
+
+  round_trip_response_test! {
+    name:     collection_search_response,
+    payload:  Vec<CollectionId>,
+    response: svc::CollectionSearchResponse,
   }
 }
