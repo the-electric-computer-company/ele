@@ -33,6 +33,7 @@ mod default;
 mod error;
 mod library;
 mod node;
+mod node_id;
 mod platform;
 pub mod pubkey;
 mod svc;

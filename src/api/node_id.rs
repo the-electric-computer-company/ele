@@ -1,28 +1,13 @@
 use super::*;
 
-#[derive(PartialEq, Debug, Clone)]
-pub struct NodeId {
-  pubkey: Pubkey,
-}
-
-impl NodeId {
-  pub fn from_pubkey(pubkey: Pubkey) -> NodeId {
-    NodeId { pubkey }
-  }
-
-  pub fn key(&self) -> Pubkey {
-    self.pubkey
-  }
-}
-
-impl api::message::Message for NodeId {
+impl Message for NodeId {
   type Protobuf = svc::NodeId;
   type Error = Error;
 
   fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
     let mut protobuf = protobuf;
     let pubkey = Pubkey::from_protobuf(protobuf.take_pubkey())?;
-    Ok(NodeId { pubkey })
+    Ok(NodeId::from_pubkey(pubkey))
   }
 
   fn into_protobuf(self) -> Self::Protobuf {
@@ -33,9 +18,7 @@ impl api::message::Message for NodeId {
 
   #[cfg(test)]
   fn required_fields() -> Self {
-    NodeId {
-      pubkey: Pubkey::required_fields(),
-    }
+    NodeId::from_pubkey(Pubkey::required_fields())
   }
 }
 
@@ -43,7 +26,7 @@ impl api::message::Message for NodeId {
 mod tests {
   use super::*;
 
-  use super::super::tests::*;
+  use api::tests::*;
 
   #[test]
   fn node_id_required_fields() {

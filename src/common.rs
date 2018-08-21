@@ -11,11 +11,12 @@ pub use std::{
 
 pub use rand::random;
 
-pub use api::{self, NodeId};
+pub use api;
 pub use default::default;
 pub use error::Error;
 pub use library::Library;
 pub use node::Node;
+pub use node_id::NodeId;
 pub use platform::{Platform, PlatformInterface};
 pub use pubkey::{self, Pubkey};
 

@@ -142,7 +142,7 @@ impl Library {
   fn initialize_settings(&self) -> Result<(), Error> {
     self.execute("CREATE TABLE settings (node_pubkey BLOB NOT NULL);")?;
 
-    let node_id = api::NodeId::from_pubkey(random());
+    let node_id = NodeId::from_pubkey(random());
 
     let blob: &[u8] = &node_id.key().bytes;
 

@@ -14,7 +14,6 @@ pub use self::{
   collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
   message::Message,
-  node_id::NodeId,
 };
 
 macro_rules! response_to_protobuf {
