@@ -36,6 +36,28 @@ impl IntoProtobuf for CollectionId {
   }
 }
 
+impl api::Message for CollectionId {
+  type Protobuf = svc::CollectionId;
+  type Error = Error;
+
+  fn from_protobuf_message(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+    FromProtobuf::from_protobuf(protobuf)
+  }
+
+  fn into_protobuf_message(self) -> Self::Protobuf {
+    self.into_protobuf()
+  }
+
+  #[cfg(test)]
+  fn required_fields_message() -> Self {
+    use api::tests::RequiredFields;
+
+    CollectionId {
+      pubkey: Pubkey::required_fields(),
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
