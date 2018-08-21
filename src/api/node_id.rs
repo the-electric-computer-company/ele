@@ -1,10 +1,13 @@
-use super::*;
+use common::*;
+
+use api::Message;
+
+use svc;
 
 impl Message for NodeId {
   type Protobuf = svc::NodeId;
-  type Error = Error;
 
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
     let mut protobuf = protobuf;
     let pubkey = Pubkey::from_protobuf(protobuf.take_pubkey())?;
     Ok(NodeId::from_pubkey(pubkey))

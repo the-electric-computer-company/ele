@@ -10,7 +10,6 @@ mod node_id;
 
 pub use self::{
   collection_create::CollectionCreateRequest,
-  collection_id::CollectionId,
   collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
   message::Message,

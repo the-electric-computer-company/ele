@@ -41,9 +41,8 @@ impl Distribution<Pubkey> for Standard {
 
 impl api::Message for Pubkey {
   type Protobuf = svc::Pubkey;
-  type Error = api::Error;
 
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
     let bytes = protobuf.get_key().to_vec();
     if bytes.len() != 16 {
       return Err(

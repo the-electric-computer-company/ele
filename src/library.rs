@@ -163,9 +163,9 @@ impl Library {
     Ok(())
   }
 
-  pub fn collection_create(&self) -> Result<api::CollectionId, Error> {
+  pub fn collection_create(&self) -> Result<CollectionId, Error> {
     let pubkey: Pubkey = random();
-    let collection_id = api::CollectionId::from_pubkey(pubkey);
+    let collection_id = CollectionId::from_pubkey(pubkey);
     let blob: &[u8] = &collection_id.key().bytes;
     self.call(
       "INSERT INTO collections (collection_pubkey) VALUES (?1)",
@@ -174,7 +174,7 @@ impl Library {
     Ok(collection_id)
   }
 
-  pub fn collection_search(&self) -> Result<Vec<api::CollectionId>, Error> {
+  pub fn collection_search(&self) -> Result<Vec<CollectionId>, Error> {
     fn get(row: &Row) -> Vec<u8> {
       row.get(0)
     }
@@ -192,7 +192,7 @@ impl Library {
 
       let id = Pubkey::from_slice(&blob)
         .map_err(|pubkey_error| Error::LibraryStoredCollectionId { pubkey_error })
-        .map(api::CollectionId::from_pubkey)?;
+        .map(CollectionId::from_pubkey)?;
       ids.push(id);
     }
 

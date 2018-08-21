@@ -7,9 +7,8 @@ pub struct CollectionSearchRequest {
 
 impl api::Message for CollectionSearchRequest {
   type Protobuf = svc::CollectionSearchRequest;
-  type Error = Error;
 
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
     let mut protobuf = protobuf;
     let node_id = NodeId::from_protobuf(protobuf.take_node_id())?;
     Ok(CollectionSearchRequest { node_id })

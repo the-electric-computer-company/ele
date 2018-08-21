@@ -7,9 +7,8 @@ pub struct CollectionCreateRequest {
 
 impl Message for CollectionCreateRequest {
   type Protobuf = svc::CollectionCreateRequest;
-  type Error = api::Error;
 
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
     let mut protobuf = protobuf;
     let node_id = NodeId::from_protobuf(protobuf.take_node_id())?;
     Ok(CollectionCreateRequest { node_id })

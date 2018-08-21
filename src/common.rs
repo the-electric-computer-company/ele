@@ -12,6 +12,7 @@ pub use std::{
 pub use rand::random;
 
 pub use api;
+pub use collection_id::CollectionId;
 pub use default::default;
 pub use error::Error;
 pub use library::Library;

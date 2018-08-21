@@ -35,7 +35,7 @@ impl Node {
   fn collection_create_inner(
     &self,
     req: svc::CollectionCreateRequest,
-  ) -> Result<api::CollectionId, api::Error> {
+  ) -> Result<CollectionId, api::Error> {
     let req = api::CollectionCreateRequest::from_protobuf(req)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
@@ -50,7 +50,7 @@ impl Node {
   fn collection_search_inner(
     &self,
     req: svc::CollectionSearchRequest,
-  ) -> Result<Vec<api::CollectionId>, api::Error> {
+  ) -> Result<Vec<CollectionId>, api::Error> {
     let req = api::CollectionSearchRequest::from_protobuf(req)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
@@ -62,22 +62,18 @@ impl Node {
   }
 }
 
-impl Message for Vec<api::CollectionId> {
+impl Message for Vec<CollectionId> {
   type Protobuf = RepeatedField<svc::CollectionId>;
-  type Error = api::Error;
 
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
     protobuf
       .into_iter()
-      .map(api::CollectionId::from_protobuf)
-      .collect::<Result<Vec<api::CollectionId>, api::Error>>()
+      .map(CollectionId::from_protobuf)
+      .collect::<Result<Vec<CollectionId>, api::Error>>()
   }
 
   fn into_protobuf(self) -> Self::Protobuf {
-    self
-      .into_iter()
-      .map(api::CollectionId::into_protobuf)
-      .collect()
+    self.into_iter().map(CollectionId::into_protobuf).collect()
   }
 
   #[cfg(test)]
@@ -136,7 +132,7 @@ mod tests {
     server.build().unwrap()
   }
 
-  fn create_req(client: &svc::NodeClient, node_id: NodeId) -> api::CollectionId {
+  fn create_req(client: &svc::NodeClient, node_id: NodeId) -> CollectionId {
     let create_req = api::CollectionCreateRequest { node_id };
 
     let (_, protobuf, _) = client
@@ -144,10 +140,10 @@ mod tests {
       .wait()
       .unwrap();
 
-    response_from_protobuf!(protobuf, api::CollectionId).unwrap()
+    response_from_protobuf!(protobuf, CollectionId).unwrap()
   }
 
-  fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<api::CollectionId> {
+  fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<CollectionId> {
     let req = api::CollectionSearchRequest { node_id };
 
     let (_, protobuf, _) = client
@@ -155,7 +151,7 @@ mod tests {
       .wait()
       .unwrap();
 
-    response_from_protobuf!(protobuf, Vec<api::CollectionId>).unwrap()
+    response_from_protobuf!(protobuf, Vec<CollectionId>).unwrap()
   }
 
   #[test]
@@ -189,7 +185,7 @@ mod tests {
       .wait()
       .unwrap();
 
-    let response = response_from_protobuf!(protobuf, api::CollectionId);
+    let response = response_from_protobuf!(protobuf, CollectionId);
 
     match response {
       Ok(value) => panic!("expected error: {:?}", value),

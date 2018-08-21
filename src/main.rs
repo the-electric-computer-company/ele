@@ -28,6 +28,7 @@ mod show;
 
 #[macro_use]
 pub mod api;
+mod collection_id;
 mod common;
 mod default;
 mod error;

@@ -1,25 +1,12 @@
-use super::*;
+use common::*;
 
-#[derive(PartialEq, Debug, Clone)]
-pub struct CollectionId {
-  pub pubkey: Pubkey,
-}
+use api::Message;
+use svc;
 
-impl CollectionId {
-  pub fn from_pubkey(pubkey: Pubkey) -> CollectionId {
-    CollectionId { pubkey }
-  }
-
-  pub fn key(&self) -> Pubkey {
-    self.pubkey
-  }
-}
-
-impl api::Message for CollectionId {
+impl Message for CollectionId {
   type Protobuf = svc::CollectionId;
-  type Error = Error;
 
-  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, Self::Error> {
+  fn from_protobuf(protobuf: Self::Protobuf) -> Result<Self, api::Error> {
     let mut protobuf = protobuf;
     let pubkey = Pubkey::from_protobuf(protobuf.take_pubkey())?;
     Ok(CollectionId { pubkey })
@@ -43,7 +30,7 @@ impl api::Message for CollectionId {
 mod tests {
   use super::*;
 
-  use super::super::tests::*;
+  use api::tests::*;
 
   #[test]
   fn collection_id_required_fields() {
