@@ -109,7 +109,7 @@ impl Library {
     self.set_journal_mode()?;
     self.initialize_settings()?;
 
-    self.create_collections_table()?;
+    self.create_tables()?;
     Ok(())
   }
 
@@ -158,8 +158,19 @@ impl Library {
       .map(NodeId::from_pubkey)
   }
 
-  fn create_collections_table(&self) -> Result<(), Error> {
+  fn create_tables(&self) -> Result<(), Error> {
     self.execute("CREATE TABLE collections (collection_pubkey BLOB NOT NULL);")?;
+    self.execute("CREATE TABLE archives (hash BLOB PRIMARY KEY, data BLOB NOT NULL);")?;
+    self.execute("CREATE TABLE entries (id INTEGER PRIMARY KEY);")?;
+    self.execute(
+      "CREATE TABLE bundles
+                  (id INTEGER PRIMARY KEY,
+                   record BLOB,
+                   archivehash BLOB,
+                   entryid INTEGER,
+                   FOREIGN KEY(archivehash) REFERENCES archives(hash),
+                   FOREIGN KEY(entryid) REFERENCES entries(id));",
+    )?;
     Ok(())
   }
 
