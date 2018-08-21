@@ -38,6 +38,7 @@ mod collection_id;
 mod common;
 mod default;
 mod error;
+mod hash;
 mod library;
 mod node;
 mod node_id;

@@ -3,6 +3,7 @@ mod collection_create;
 mod collection_id;
 mod collection_search;
 mod error;
+mod hash;
 mod message;
 mod node_id;
 mod repeated;
@@ -80,6 +81,7 @@ pub mod tests {
   #[test]
   fn round_trips() {
     test_round_trip::<Pubkey, svc::Pubkey>();
+    test_round_trip::<Hash, svc::Hash>();
     test_round_trip::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
     test_round_trip::<BundleId, svc::BundleId>();

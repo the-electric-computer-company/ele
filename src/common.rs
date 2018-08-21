@@ -16,6 +16,7 @@ pub use bundle_id::BundleId;
 pub use collection_id::CollectionId;
 pub use default::default;
 pub use error::Error;
+pub use hash::Hash;
 pub use library::Library;
 pub use node::Node;
 pub use node_id::NodeId;

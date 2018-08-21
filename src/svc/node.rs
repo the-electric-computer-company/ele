@@ -1776,6 +1776,169 @@ impl ::protobuf::reflect::ProtobufValue for BundleId {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct Hash {
+    // message fields
+    pub hash: ::std::vec::Vec<u8>,
+    // special fields
+    unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::protobuf::CachedSize,
+}
+
+impl Hash {
+    pub fn new() -> Hash {
+        ::std::default::Default::default()
+    }
+
+    // bytes hash = 1;
+
+    pub fn clear_hash(&mut self) {
+        self.hash.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_hash(&mut self, v: ::std::vec::Vec<u8>) {
+        self.hash = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_hash(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.hash
+    }
+
+    // Take field
+    pub fn take_hash(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.hash, ::std::vec::Vec::new())
+    }
+
+    pub fn get_hash(&self) -> &[u8] {
+        &self.hash
+    }
+}
+
+impl ::protobuf::Message for Hash {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.hash)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if !self.hash.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.hash);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if !self.hash.is_empty() {
+            os.write_bytes(1, &self.hash)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> Hash {
+        Hash::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "hash",
+                    |m: &Hash| { &m.hash },
+                    |m: &mut Hash| { &mut m.hash },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<Hash>(
+                    "Hash",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static Hash {
+        static mut instance: ::protobuf::lazy::Lazy<Hash> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const Hash,
+        };
+        unsafe {
+            instance.get(Hash::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for Hash {
+    fn clear(&mut self) {
+        self.clear_hash();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for Hash {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Hash {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\nnode.proto\"5\n\x05Error\x12\x12\n\x04code\x18\x01\x20\x01(\rR\x04co\
     de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x1a\n\x06Pubkey\
@@ -1791,10 +1954,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x06.ErrorR\x05error\x12'\n\x07payload\x18\x02\x20\x01(\x0b2\r.Collectio\
     nIdR\x07payload\"[\n\x08BundleId\x122\n\rcollection_id\x18\x01\x20\x01(\
     \x0b2\r.CollectionIdR\x0ccollectionId\x12\x1b\n\tbundle_id\x18\x02\x20\
-    \x01(\x0cR\x08bundleId2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\x12\
-    \x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\x12I\n\
-    \x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.CollectionS\
-    earchResponse\"\0b\x06proto3\
+    \x01(\x0cR\x08bundleId\"\x1a\n\x04Hash\x12\x12\n\x04hash\x18\x01\x20\x01\
+    (\x0cR\x04hash2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\x12\x18.Col\
+    lectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\x12I\n\x10Coll\
+    ectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.CollectionSearchRes\
+    ponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

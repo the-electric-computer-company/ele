@@ -55,9 +55,9 @@ message BundleId {
  bytes bundle_id = 2;
 }
 
-// message Hash {
-//  bytes hash = 1;
-// }
+message Hash {
+ bytes hash = 1;
+}
 
 // message ArchiveStreamRequest {
 //   BundleId  bundle_id = 2;
