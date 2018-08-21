@@ -16,16 +16,6 @@ impl FromProtobuf for CollectionCreateRequest {
   }
 }
 
-impl IntoProtobuf for CollectionCreateRequest {
-  type Protobuf = svc::CollectionCreateRequest;
-
-  fn into_protobuf(self) -> svc::CollectionCreateRequest {
-    let mut protobuf = svc::CollectionCreateRequest::new();
-    protobuf.set_node_id(self.node_id.into_protobuf_message());
-    protobuf
-  }
-}
-
 impl Message for CollectionCreateRequest {
   type Protobuf = svc::CollectionCreateRequest;
   type Error = api::Error;
@@ -35,7 +25,9 @@ impl Message for CollectionCreateRequest {
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
-    self.into_protobuf()
+    let mut protobuf = svc::CollectionCreateRequest::new();
+    protobuf.set_node_id(self.node_id.into_protobuf_message());
+    protobuf
   }
 
   #[cfg(test)]

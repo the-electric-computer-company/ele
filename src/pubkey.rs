@@ -7,7 +7,7 @@ use rand::{
   Rng,
 };
 
-use api::{FromProtobuf, IntoProtobuf};
+use api::FromProtobuf;
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
@@ -50,21 +50,14 @@ impl api::Message for Pubkey {
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
-    self.into_protobuf()
+    let mut protobuf = svc::Pubkey::new();
+    protobuf.set_key((&self.bytes[..]).to_vec());
+    protobuf
   }
 
   #[cfg(test)]
   fn required_fields_message() -> Self {
     random()
-  }
-}
-
-impl IntoProtobuf for Pubkey {
-  type Protobuf = svc::Pubkey;
-  fn into_protobuf(self) -> svc::Pubkey {
-    let mut pb_pubkey = svc::Pubkey::new();
-    pb_pubkey.set_key((&self.bytes[..]).to_vec());
-    pb_pubkey
   }
 }
 

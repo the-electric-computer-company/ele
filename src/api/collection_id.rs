@@ -26,16 +26,6 @@ impl FromProtobuf for CollectionId {
   }
 }
 
-impl IntoProtobuf for CollectionId {
-  type Protobuf = svc::CollectionId;
-
-  fn into_protobuf(self) -> svc::CollectionId {
-    let mut pb_collection_id = svc::CollectionId::new();
-    pb_collection_id.set_pubkey(self.pubkey.into_protobuf());
-    pb_collection_id
-  }
-}
-
 impl api::Message for CollectionId {
   type Protobuf = svc::CollectionId;
   type Error = Error;
@@ -45,7 +35,9 @@ impl api::Message for CollectionId {
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
-    self.into_protobuf()
+    let mut protobuf = svc::CollectionId::new();
+    protobuf.set_pubkey(self.pubkey.into_protobuf_message());
+    protobuf
   }
 
   #[cfg(test)]
@@ -65,7 +57,7 @@ mod tests {
   #[test]
   fn collection_id_required_fields() {
     test_required_fields::<CollectionId, svc::CollectionId>(&[|p| {
-      p.set_pubkey(Pubkey::required_fields_message().into_protobuf())
+      p.set_pubkey(Pubkey::required_fields_message().into_protobuf_message())
     }])
   }
 }

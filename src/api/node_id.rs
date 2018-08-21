@@ -57,7 +57,7 @@ mod tests {
   #[test]
   fn node_id_required_fields() {
     test_required_fields::<NodeId, svc::NodeId>(&[|p| {
-      p.set_pubkey(random::<Pubkey>().into_protobuf())
+      p.set_pubkey(random::<Pubkey>().into_protobuf_message())
     }])
   }
 }

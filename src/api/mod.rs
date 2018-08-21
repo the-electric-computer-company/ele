@@ -6,7 +6,6 @@ mod collection_id;
 mod collection_search;
 mod error;
 mod from_protobuf;
-mod into_protobuf;
 mod message;
 mod node_id;
 
@@ -16,7 +15,6 @@ pub use self::{
   collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
   from_protobuf::FromProtobuf,
-  into_protobuf::IntoProtobuf,
   message::Message,
   node_id::NodeId,
 };
@@ -28,7 +26,7 @@ macro_rules! response_to_protobuf {
     let mut response: $response = Default::default();
 
     match result {
-      Ok(payload) => response.set_payload(payload.into_protobuf()),
+      Ok(payload) => response.set_payload(payload.into_protobuf_message()),
       Err(error) => response.set_error(error.into_protobuf()),
     }
 
@@ -43,7 +41,7 @@ macro_rules! response_from_protobuf {
     if protobuf.has_error() {
       Err(api::Error::from_protobuf(protobuf.take_error()))
     } else {
-      <$payload>::from_protobuf(protobuf.take_payload())
+      <$payload>::from_protobuf_message(protobuf.take_payload())
     }
   }};
 }

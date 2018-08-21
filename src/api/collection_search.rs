@@ -16,16 +16,6 @@ impl FromProtobuf for CollectionSearchRequest {
   }
 }
 
-impl IntoProtobuf for CollectionSearchRequest {
-  type Protobuf = svc::CollectionSearchRequest;
-
-  fn into_protobuf(self) -> svc::CollectionSearchRequest {
-    let mut protobuf = svc::CollectionSearchRequest::new();
-    protobuf.set_node_id(self.node_id.into_protobuf_message());
-    protobuf
-  }
-}
-
 impl api::Message for CollectionSearchRequest {
   type Protobuf = svc::CollectionSearchRequest;
   type Error = Error;
@@ -35,7 +25,9 @@ impl api::Message for CollectionSearchRequest {
   }
 
   fn into_protobuf_message(self) -> Self::Protobuf {
-    self.into_protobuf()
+    let mut protobuf = svc::CollectionSearchRequest::new();
+    protobuf.set_node_id(self.node_id.into_protobuf_message());
+    protobuf
   }
 
   #[cfg(test)]
