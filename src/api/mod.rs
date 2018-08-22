@@ -1,3 +1,4 @@
+mod bundle_create;
 mod bundle_id;
 mod collection_create;
 mod collection_id;
@@ -9,6 +10,7 @@ mod node_id;
 mod repeated;
 
 pub use self::{
+  bundle_create::BundleCreateRequest,
   collection_create::CollectionCreateRequest,
   collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
@@ -87,6 +89,7 @@ pub mod tests {
     test_round_trip::<BundleId, svc::BundleId>();
     test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+    test_round_trip::<BundleCreateRequest, svc::BundleCreateRequest>();
   }
 
   macro_rules! round_trip_response_test {

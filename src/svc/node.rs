@@ -1939,6 +1939,382 @@ impl ::protobuf::reflect::ProtobufValue for Hash {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct BundleCreateRequest {
+    // message fields
+    pub collection_id: ::protobuf::SingularPtrField<CollectionId>,
+    pub record_hash: ::protobuf::SingularPtrField<Hash>,
+    pub record_data: ::std::vec::Vec<u8>,
+    pub archive_hash: ::protobuf::SingularPtrField<Hash>,
+    pub archive_data: ::std::vec::Vec<u8>,
+    // special fields
+    unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::protobuf::CachedSize,
+}
+
+impl BundleCreateRequest {
+    pub fn new() -> BundleCreateRequest {
+        ::std::default::Default::default()
+    }
+
+    // .CollectionId collection_id = 1;
+
+    pub fn clear_collection_id(&mut self) {
+        self.collection_id.clear();
+    }
+
+    pub fn has_collection_id(&self) -> bool {
+        self.collection_id.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_collection_id(&mut self, v: CollectionId) {
+        self.collection_id = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_collection_id(&mut self) -> &mut CollectionId {
+        if self.collection_id.is_none() {
+            self.collection_id.set_default();
+        }
+        self.collection_id.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_collection_id(&mut self) -> CollectionId {
+        self.collection_id.take().unwrap_or_else(|| CollectionId::new())
+    }
+
+    pub fn get_collection_id(&self) -> &CollectionId {
+        self.collection_id.as_ref().unwrap_or_else(|| CollectionId::default_instance())
+    }
+
+    // .Hash record_hash = 2;
+
+    pub fn clear_record_hash(&mut self) {
+        self.record_hash.clear();
+    }
+
+    pub fn has_record_hash(&self) -> bool {
+        self.record_hash.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_record_hash(&mut self, v: Hash) {
+        self.record_hash = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_record_hash(&mut self) -> &mut Hash {
+        if self.record_hash.is_none() {
+            self.record_hash.set_default();
+        }
+        self.record_hash.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_record_hash(&mut self) -> Hash {
+        self.record_hash.take().unwrap_or_else(|| Hash::new())
+    }
+
+    pub fn get_record_hash(&self) -> &Hash {
+        self.record_hash.as_ref().unwrap_or_else(|| Hash::default_instance())
+    }
+
+    // bytes record_data = 3;
+
+    pub fn clear_record_data(&mut self) {
+        self.record_data.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_record_data(&mut self, v: ::std::vec::Vec<u8>) {
+        self.record_data = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_record_data(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.record_data
+    }
+
+    // Take field
+    pub fn take_record_data(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.record_data, ::std::vec::Vec::new())
+    }
+
+    pub fn get_record_data(&self) -> &[u8] {
+        &self.record_data
+    }
+
+    // .Hash archive_hash = 4;
+
+    pub fn clear_archive_hash(&mut self) {
+        self.archive_hash.clear();
+    }
+
+    pub fn has_archive_hash(&self) -> bool {
+        self.archive_hash.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_archive_hash(&mut self, v: Hash) {
+        self.archive_hash = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_archive_hash(&mut self) -> &mut Hash {
+        if self.archive_hash.is_none() {
+            self.archive_hash.set_default();
+        }
+        self.archive_hash.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_archive_hash(&mut self) -> Hash {
+        self.archive_hash.take().unwrap_or_else(|| Hash::new())
+    }
+
+    pub fn get_archive_hash(&self) -> &Hash {
+        self.archive_hash.as_ref().unwrap_or_else(|| Hash::default_instance())
+    }
+
+    // bytes archive_data = 5;
+
+    pub fn clear_archive_data(&mut self) {
+        self.archive_data.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_archive_data(&mut self, v: ::std::vec::Vec<u8>) {
+        self.archive_data = v;
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_archive_data(&mut self) -> &mut ::std::vec::Vec<u8> {
+        &mut self.archive_data
+    }
+
+    // Take field
+    pub fn take_archive_data(&mut self) -> ::std::vec::Vec<u8> {
+        ::std::mem::replace(&mut self.archive_data, ::std::vec::Vec::new())
+    }
+
+    pub fn get_archive_data(&self) -> &[u8] {
+        &self.archive_data
+    }
+}
+
+impl ::protobuf::Message for BundleCreateRequest {
+    fn is_initialized(&self) -> bool {
+        for v in &self.collection_id {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        for v in &self.record_hash {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        for v in &self.archive_hash {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.collection_id)?;
+                },
+                2 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.record_hash)?;
+                },
+                3 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.record_data)?;
+                },
+                4 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.archive_hash)?;
+                },
+                5 => {
+                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.archive_data)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(ref v) = self.collection_id.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        if let Some(ref v) = self.record_hash.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        if !self.record_data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(3, &self.record_data);
+        }
+        if let Some(ref v) = self.archive_hash.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        if !self.archive_data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(5, &self.archive_data);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if let Some(ref v) = self.collection_id.as_ref() {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if let Some(ref v) = self.record_hash.as_ref() {
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if !self.record_data.is_empty() {
+            os.write_bytes(3, &self.record_data)?;
+        }
+        if let Some(ref v) = self.archive_hash.as_ref() {
+            os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if !self.archive_data.is_empty() {
+            os.write_bytes(5, &self.archive_data)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> BundleCreateRequest {
+        BundleCreateRequest::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<CollectionId>>(
+                    "collection_id",
+                    |m: &BundleCreateRequest| { &m.collection_id },
+                    |m: &mut BundleCreateRequest| { &mut m.collection_id },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Hash>>(
+                    "record_hash",
+                    |m: &BundleCreateRequest| { &m.record_hash },
+                    |m: &mut BundleCreateRequest| { &mut m.record_hash },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "record_data",
+                    |m: &BundleCreateRequest| { &m.record_data },
+                    |m: &mut BundleCreateRequest| { &mut m.record_data },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Hash>>(
+                    "archive_hash",
+                    |m: &BundleCreateRequest| { &m.archive_hash },
+                    |m: &mut BundleCreateRequest| { &mut m.archive_hash },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                    "archive_data",
+                    |m: &BundleCreateRequest| { &m.archive_data },
+                    |m: &mut BundleCreateRequest| { &mut m.archive_data },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<BundleCreateRequest>(
+                    "BundleCreateRequest",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static BundleCreateRequest {
+        static mut instance: ::protobuf::lazy::Lazy<BundleCreateRequest> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const BundleCreateRequest,
+        };
+        unsafe {
+            instance.get(BundleCreateRequest::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for BundleCreateRequest {
+    fn clear(&mut self) {
+        self.clear_collection_id();
+        self.clear_record_hash();
+        self.clear_record_data();
+        self.clear_archive_hash();
+        self.clear_archive_data();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for BundleCreateRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for BundleCreateRequest {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\nnode.proto\"5\n\x05Error\x12\x12\n\x04code\x18\x01\x20\x01(\rR\x04co\
     de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x1a\n\x06Pubkey\
@@ -1955,10 +2331,15 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     nIdR\x07payload\"[\n\x08BundleId\x122\n\rcollection_id\x18\x01\x20\x01(\
     \x0b2\r.CollectionIdR\x0ccollectionId\x12\x1b\n\tbundle_id\x18\x02\x20\
     \x01(\x0cR\x08bundleId\"\x1a\n\x04Hash\x12\x12\n\x04hash\x18\x01\x20\x01\
-    (\x0cR\x04hash2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\x12\x18.Col\
-    lectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\x12I\n\x10Coll\
-    ectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.CollectionSearchRes\
-    ponse\"\0b\x06proto3\
+    (\x0cR\x04hash\"\xdf\x01\n\x13BundleCreateRequest\x122\n\rcollection_id\
+    \x18\x01\x20\x01(\x0b2\r.CollectionIdR\x0ccollectionId\x12&\n\x0brecord_\
+    hash\x18\x02\x20\x01(\x0b2\x05.HashR\nrecordHash\x12\x1f\n\x0brecord_dat\
+    a\x18\x03\x20\x01(\x0cR\nrecordData\x12(\n\x0carchive_hash\x18\x04\x20\
+    \x01(\x0b2\x05.HashR\x0barchiveHash\x12!\n\x0carchive_data\x18\x05\x20\
+    \x01(\x0cR\x0barchiveData2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\
+    \x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\
+    \x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.Coll\
+    ectionSearchResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

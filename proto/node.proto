@@ -88,11 +88,13 @@ message Hash {
 //   Error error = 2;
 // }
 
-// message BundleCreateRequest {
-//   CollectionId collection_id = 2;
-//   Hash hash = 3;
-//   bytes data = 4;
-// }
+message BundleCreateRequest {
+  CollectionId collection_id = 1;
+  Hash record_hash = 2;
+  bytes record_data = 3;
+  Hash archive_hash = 4;
+  bytes archive_data = 5;
+}
 
 // message BundleCreateResponse {
 //   Error error = 2;
