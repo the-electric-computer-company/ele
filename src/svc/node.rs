@@ -2315,6 +2315,241 @@ impl ::protobuf::reflect::ProtobufValue for BundleCreateRequest {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct BundleCreateResponse {
+    // message fields
+    pub error: ::protobuf::SingularPtrField<Error>,
+    pub payload: ::protobuf::SingularPtrField<BundleId>,
+    // special fields
+    unknown_fields: ::protobuf::UnknownFields,
+    cached_size: ::protobuf::CachedSize,
+}
+
+impl BundleCreateResponse {
+    pub fn new() -> BundleCreateResponse {
+        ::std::default::Default::default()
+    }
+
+    // .Error error = 1;
+
+    pub fn clear_error(&mut self) {
+        self.error.clear();
+    }
+
+    pub fn has_error(&self) -> bool {
+        self.error.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_error(&mut self, v: Error) {
+        self.error = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_error(&mut self) -> &mut Error {
+        if self.error.is_none() {
+            self.error.set_default();
+        }
+        self.error.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_error(&mut self) -> Error {
+        self.error.take().unwrap_or_else(|| Error::new())
+    }
+
+    pub fn get_error(&self) -> &Error {
+        self.error.as_ref().unwrap_or_else(|| Error::default_instance())
+    }
+
+    // .BundleId payload = 2;
+
+    pub fn clear_payload(&mut self) {
+        self.payload.clear();
+    }
+
+    pub fn has_payload(&self) -> bool {
+        self.payload.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_payload(&mut self, v: BundleId) {
+        self.payload = ::protobuf::SingularPtrField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_payload(&mut self) -> &mut BundleId {
+        if self.payload.is_none() {
+            self.payload.set_default();
+        }
+        self.payload.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_payload(&mut self) -> BundleId {
+        self.payload.take().unwrap_or_else(|| BundleId::new())
+    }
+
+    pub fn get_payload(&self) -> &BundleId {
+        self.payload.as_ref().unwrap_or_else(|| BundleId::default_instance())
+    }
+}
+
+impl ::protobuf::Message for BundleCreateResponse {
+    fn is_initialized(&self) -> bool {
+        for v in &self.error {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        for v in &self.payload {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.error)?;
+                },
+                2 => {
+                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.payload)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(ref v) = self.error.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        if let Some(ref v) = self.payload.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if let Some(ref v) = self.error.as_ref() {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        if let Some(ref v) = self.payload.as_ref() {
+            os.write_tag(2, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> BundleCreateResponse {
+        BundleCreateResponse::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Error>>(
+                    "error",
+                    |m: &BundleCreateResponse| { &m.error },
+                    |m: &mut BundleCreateResponse| { &mut m.error },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<BundleId>>(
+                    "payload",
+                    |m: &BundleCreateResponse| { &m.payload },
+                    |m: &mut BundleCreateResponse| { &mut m.payload },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<BundleCreateResponse>(
+                    "BundleCreateResponse",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static BundleCreateResponse {
+        static mut instance: ::protobuf::lazy::Lazy<BundleCreateResponse> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const BundleCreateResponse,
+        };
+        unsafe {
+            instance.get(BundleCreateResponse::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for BundleCreateResponse {
+    fn clear(&mut self) {
+        self.clear_error();
+        self.clear_payload();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for BundleCreateResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for BundleCreateResponse {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\nnode.proto\"5\n\x05Error\x12\x12\n\x04code\x18\x01\x20\x01(\rR\x04co\
     de\x12\x18\n\x07message\x18\x02\x20\x01(\tR\x07message\"\x1a\n\x06Pubkey\
@@ -2336,10 +2571,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     hash\x18\x02\x20\x01(\x0b2\x05.HashR\nrecordHash\x12\x1f\n\x0brecord_dat\
     a\x18\x03\x20\x01(\x0cR\nrecordData\x12(\n\x0carchive_hash\x18\x04\x20\
     \x01(\x0b2\x05.HashR\x0barchiveHash\x12!\n\x0carchive_data\x18\x05\x20\
-    \x01(\x0cR\x0barchiveData2\x9c\x01\n\x04Node\x12I\n\x10CollectionCreate\
-    \x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResponse\"\0\
-    \x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\x19.Coll\
-    ectionSearchResponse\"\0b\x06proto3\
+    \x01(\x0cR\x0barchiveData\"Y\n\x14BundleCreateResponse\x12\x1c\n\x05erro\
+    r\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x12#\n\x07payload\x18\x02\
+    \x20\x01(\x0b2\t.BundleIdR\x07payload2\x9c\x01\n\x04Node\x12I\n\x10Colle\
+    ctionCreate\x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResp\
+    onse\"\0\x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\
+    \x19.CollectionSearchResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

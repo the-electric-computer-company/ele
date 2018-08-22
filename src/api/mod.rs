@@ -120,4 +120,11 @@ pub mod tests {
     payload:  Vec<CollectionId>,
     response: svc::CollectionSearchResponse,
   }
+
+  round_trip_response_test! {
+    name:     bundle_create_response,
+    payload:  BundleId,
+    response: svc::BundleCreateResponse,
+  }
+
 }

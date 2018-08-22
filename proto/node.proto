@@ -96,10 +96,10 @@ message BundleCreateRequest {
   bytes archive_data = 5;
 }
 
-// message BundleCreateResponse {
-//   Error error = 2;
-//   BundleId bundle_id = 3;
-// }
+message BundleCreateResponse {
+  Error error = 1;
+  BundleId payload = 2;
+}
 
 // message BundleDeleteRequest {
 //   BundleId bundle_id = 2;
