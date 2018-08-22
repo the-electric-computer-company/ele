@@ -2573,10 +2573,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01(\x0b2\x05.HashR\x0barchiveHash\x12!\n\x0carchive_data\x18\x05\x20\
     \x01(\x0cR\x0barchiveData\"Y\n\x14BundleCreateResponse\x12\x1c\n\x05erro\
     r\x18\x01\x20\x01(\x0b2\x06.ErrorR\x05error\x12#\n\x07payload\x18\x02\
-    \x20\x01(\x0b2\t.BundleIdR\x07payload2\x9c\x01\n\x04Node\x12I\n\x10Colle\
+    \x20\x01(\x0b2\t.BundleIdR\x07payload2\xdb\x01\n\x04Node\x12I\n\x10Colle\
     ctionCreate\x12\x18.CollectionCreateRequest\x1a\x19.CollectionCreateResp\
     onse\"\0\x12I\n\x10CollectionSearch\x12\x18.CollectionSearchRequest\x1a\
-    \x19.CollectionSearchResponse\"\0b\x06proto3\
+    \x19.CollectionSearchResponse\"\0\x12=\n\x0cBundleCreate\x12\x14.BundleC\
+    reateRequest\x1a\x15.BundleCreateResponse\"\0b\x06proto3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

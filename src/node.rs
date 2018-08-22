@@ -33,13 +33,13 @@ impl Node {
 
   fn collection_create_inner(
     &self,
-    req: svc::CollectionCreateRequest,
+    request: svc::CollectionCreateRequest,
   ) -> Result<CollectionId, api::Error> {
-    let req = api::CollectionCreateRequest::from_protobuf(req)?;
+    let request = api::CollectionCreateRequest::from_protobuf(request)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
 
-    if req.node_id == node_id {
+    if request.node_id == node_id {
       Ok(unwrap_internal_error(self.library.collection_create()))
     } else {
       Err(api::ErrorKind::WouldProxy.into_error("proxy not implemented"))
@@ -48,20 +48,43 @@ impl Node {
 
   fn collection_search_inner(
     &self,
-    req: svc::CollectionSearchRequest,
+    request: svc::CollectionSearchRequest,
   ) -> Result<Vec<CollectionId>, api::Error> {
-    let req = api::CollectionSearchRequest::from_protobuf(req)?;
+    let request = api::CollectionSearchRequest::from_protobuf(request)?;
 
     let node_id = unwrap_internal_error(self.library.node_id());
-    if req.node_id == node_id {
+    if request.node_id == node_id {
       Ok(unwrap_internal_error(self.library.collection_search()))
     } else {
       Err(api::ErrorKind::WouldProxy.into_error("proxy not implemented"))
     }
   }
+
+  fn bundle_create_inner(&self, request: svc::BundleCreateRequest) -> Result<BundleId, api::Error> {
+    let api::BundleCreateRequest {
+      collection_id,
+      record_hash,
+      record_data,
+      archive_hash,
+      archive_data,
+    } = api::BundleCreateRequest::from_protobuf(request)?;
+
+    let verify_record_hash = Hash::from_content(record_data.as_slice());
+    if record_hash != verify_record_hash {
+      return Err(api::ErrorKind::Hash.into_error("invalid record hash"));
+    }
+
+    let verify_archive_hash = Hash::from_content(archive_data.as_slice());
+    if archive_hash != verify_archive_hash {
+      return Err(api::ErrorKind::Hash.into_error("invalid archive hash"));
+    }
+
+    let bundle_id = BundleId::from_collection_id(collection_id);
+    Ok(bundle_id)
+  }
 }
 
-impl svc::Node for Node {
+impl svc::Node for &'static Node {
   fn collection_create(
     &self,
     _options: ::grpc::RequestOptions,
@@ -81,86 +104,147 @@ impl svc::Node for Node {
     let protobuf = response_to_protobuf!(response, svc::CollectionSearchResponse);
     grpc::SingleResponse::completed(protobuf)
   }
+
+  fn bundle_create(
+    &self,
+    _options: ::grpc::RequestOptions,
+    request: svc::BundleCreateRequest,
+  ) -> ::grpc::SingleResponse<svc::BundleCreateResponse> {
+    let response = self.bundle_create_inner(request);
+    let protobuf = response_to_protobuf!(response, svc::BundleCreateResponse);
+    grpc::SingleResponse::completed(protobuf)
+  }
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
 
-  fn test_client(port: u16) -> svc::NodeClient {
-    let conf = grpc::ClientConf::new();
-    svc::NodeClient::new_plain("127.0.0.1", port, conf).unwrap()
+  struct Test {
+    node: &'static Node,
+    client: svc::NodeClient,
+    _server: grpc::Server,
   }
 
-  fn test_node() -> Node {
-    let tempdir = TempDir::new().unwrap();
+  impl Test {
+    fn new() -> Test {
+      test_init();
 
-    let library_child = tempdir.child("library.db");
-    let library_path = library_child.path();
+      let node = Test::node();
+      let node = Box::new(node);
+      // TODO: this is way less than ideal. The server will continue running
+      // after the test ends, and because grpc::Server doesn't implement drop,
+      // we cant drop it. In practice it's not too bad until we run enough tests
+      // to have many servers running in the background.
+      let node: &'static mut Node = Box::leak(node);
+      let server = Test::server(node);
+      let client = Test::client(server.local_addr().port().unwrap());
 
-    let library = Library::with_path(library_path).unwrap();
+      Test {
+        node,
+        client,
+        _server: server,
+      }
+    }
 
-    Node::new(library)
-  }
+    fn node() -> Node {
+      let tempdir = TempDir::new().unwrap();
 
-  fn test_server(node: Node) -> grpc::Server {
-    let mut server = grpc::ServerBuilder::new_plain();
-    server.http.set_addr("127.0.0.1:0").unwrap();
-    server.add_service(svc::NodeServer::new_service_def(node));
-    server.http.set_cpu_pool_threads(1);
-    server.build().unwrap()
-  }
+      let library_child = tempdir.child("library.db");
+      let library_path = library_child.path();
 
-  fn create_req(client: &svc::NodeClient, node_id: NodeId) -> CollectionId {
-    let create_req = api::CollectionCreateRequest { node_id };
+      let library = Library::with_path(library_path).unwrap();
 
-    let (_, protobuf, _) = client
-      .collection_create(Default::default(), create_req.into_protobuf())
-      .wait()
-      .unwrap();
+      Node::new(library)
+    }
 
-    response_from_protobuf!(protobuf, CollectionId).unwrap()
-  }
+    fn client(port: u16) -> svc::NodeClient {
+      let conf = grpc::ClientConf::new();
+      svc::NodeClient::new_plain("127.0.0.1", port, conf).unwrap()
+    }
 
-  fn search_req(client: &svc::NodeClient, node_id: NodeId) -> Vec<CollectionId> {
-    let req = api::CollectionSearchRequest { node_id };
+    fn server(node: &'static Node) -> grpc::Server {
+      let mut server = grpc::ServerBuilder::new_plain();
+      server.http.set_addr("127.0.0.1:0").unwrap();
+      server.add_service(svc::NodeServer::new_service_def(node));
+      server.http.set_cpu_pool_threads(1);
+      server.build().unwrap()
+    }
 
-    let (_, protobuf, _) = client
-      .collection_search(Default::default(), req.into_protobuf())
-      .wait()
-      .unwrap();
+    fn collection_create(&self, node_id: NodeId) -> CollectionId {
+      let create_req = api::CollectionCreateRequest { node_id };
 
-    response_from_protobuf!(protobuf, Vec<CollectionId>).unwrap()
+      let (_, protobuf, _) = self
+        .client
+        .collection_create(Default::default(), create_req.into_protobuf())
+        .wait()
+        .unwrap();
+
+      response_from_protobuf!(protobuf, CollectionId).unwrap()
+    }
+
+    fn collection_search(&self, node_id: NodeId) -> Vec<CollectionId> {
+      let req = api::CollectionSearchRequest { node_id };
+
+      let (_, protobuf, _) = self
+        .client
+        .collection_search(Default::default(), req.into_protobuf())
+        .wait()
+        .unwrap();
+
+      response_from_protobuf!(protobuf, Vec<CollectionId>).unwrap()
+    }
+
+    fn bundle_create(
+      &self,
+      collection_id: CollectionId,
+      record: &[u8],
+      archive: &[u8],
+    ) -> BundleId {
+      let record_data = record.to_vec();
+      let record_hash = Hash::from_content(record);
+
+      let archive_data = archive.to_vec();
+      let archive_hash = Hash::from_content(archive);
+
+      let request = api::BundleCreateRequest {
+        collection_id,
+        record_hash,
+        record_data,
+        archive_hash,
+        archive_data,
+      };
+
+      let (_, protobuf, _) = self
+        .client
+        .bundle_create(Default::default(), request.into_protobuf())
+        .wait()
+        .unwrap();
+
+      response_from_protobuf!(protobuf, BundleId).unwrap()
+    }
   }
 
   #[test]
   fn collection_create_success() {
-    test_init();
+    let test = Test::new();
 
-    let node = test_node();
-    let node_id = node.library.node_id().unwrap();
+    let node_id = test.node.library.node_id().unwrap();
 
-    let server = test_server(node);
-    let client = test_client(server.local_addr().port().unwrap());
-
-    create_req(&client, node_id);
+    test.collection_create(node_id);
   }
 
   #[test]
   fn collection_create_failure() {
-    test_init();
+    let test = Test::new();
 
-    let node = test_node();
+    let request = api::CollectionCreateRequest {
+      node_id: NodeId::from_pubkey(random()),
+    };
 
-    let server = test_server(node);
-    let client = test_client(server.local_addr().port().unwrap());
-
-    let node_id = NodeId::from_pubkey(random());
-
-    let req = api::CollectionCreateRequest { node_id };
-
-    let (_, protobuf, _) = client
-      .collection_create(Default::default(), req.into_protobuf())
+    let (_, protobuf, _) = test
+      .client
+      .collection_create(Default::default(), request.into_protobuf())
       .wait()
       .unwrap();
 
@@ -174,21 +258,35 @@ mod tests {
 
   #[test]
   fn collection_search_success() {
-    test_init();
+    let test = Test::new();
 
-    let node = test_node();
-    let node_id = node.library.node_id().unwrap();
+    let node_id = test.node.library.node_id().unwrap();
 
-    let server = test_server(node);
-    let client = test_client(server.local_addr().port().unwrap());
-
-    let ids = search_req(&client, node_id.clone());
+    let ids = test.collection_search(node_id.clone());
     assert_eq!(ids.len(), 0);
 
-    create_req(&client, node_id.clone());
+    test.collection_create(node_id.clone());
 
-    let ids = search_req(&client, node_id.clone());
+    let ids = test.collection_search(node_id.clone());
     assert_eq!(ids.len(), 1);
   }
 
+  #[test]
+  fn bundle_create_bad_record_hash() {
+    // TODO supply bad hash and figure out array to slice
+
+    let test = Test::new();
+    let node_id = test.node.library.node_id().unwrap();
+    let collection_id = test.collection_create(node_id);
+    let record = random::<[u8; 32]>().to_vec();
+    let archive = random::<[u8; 32]>().to_vec();
+    test.bundle_create(collection_id, record.as_slice(), archive.as_slice());
+  }
+
+  #[test]
+  fn bundle_create_bad_record_schema() {}
+
+  #[test]
+  fn bundle_create_bad_archive_hash() {}
+  // TODO: are there any basic forms of validation we can do on a diskimage?
 }

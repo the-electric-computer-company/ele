@@ -5,7 +5,7 @@ service Node {
   rpc CollectionSearch(CollectionSearchRequest) returns(CollectionSearchResponse) {}
   // rpc ArchiveHashGet(ArchiveHashGetRequest) returns (ArchiveHashGetResponse) {}
   // rpc ArchiveStream(ArchiveStreamRequest) returns (stream ArchiveStreamResponse) {}
-  // rpc BundleCreate(BundleCreateRequest) returns (BundleCreateResponse) {}
+  rpc BundleCreate(BundleCreateRequest) returns (BundleCreateResponse) {}
   // rpc BundleDelete(BundleDeleteRequest) returns (BundleDeleteResponse) {}
   // rpc BundlePin(BundlePinRequest) returns(BundlePinResponse) {}
   // rpc BundleSearch(BundleSearchRequest) returns(BundleSearchResponse) {}
