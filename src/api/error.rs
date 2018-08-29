@@ -2,6 +2,7 @@ use svc;
 
 const ERROR_PARSE: u32 = 1;
 const ERROR_WOULD_PROXY: u32 = 2;
+const ERROR_HASH: u32 = 3;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct Error {
@@ -14,6 +15,7 @@ pub enum ErrorKind {
   Unknown { code: u32 },
   Parse,
   WouldProxy,
+  Hash,
 }
 
 impl ErrorKind {
@@ -32,6 +34,7 @@ impl Error {
       Unknown { code } => code,
       Parse => ERROR_PARSE,
       WouldProxy => ERROR_WOULD_PROXY,
+      Hash => ERROR_HASH,
     }
   }
 
@@ -50,6 +53,7 @@ impl Error {
     let kind = match code {
       ERROR_PARSE => Parse,
       ERROR_WOULD_PROXY => WouldProxy,
+      ERROR_HASH => Hash,
       _ => Unknown { code },
     };
     Error { message, kind }
@@ -71,6 +75,14 @@ mod tests {
   #[test]
   fn would_proxy() {
     let first_error = ErrorKind::WouldProxy.into_error("foo");
+    let pb_err = first_error.clone().into_protobuf();
+    let second_error = Error::from_protobuf(pb_err);
+    assert_eq!(second_error, first_error);
+  }
+
+  #[test]
+  fn hash() {
+    let first_error = ErrorKind::Hash.into_error("foo");
     let pb_err = first_error.clone().into_protobuf();
     let second_error = Error::from_protobuf(pb_err);
     assert_eq!(second_error, first_error);

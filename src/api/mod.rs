@@ -1,12 +1,16 @@
+mod bundle_create;
+mod bundle_id;
 mod collection_create;
 mod collection_id;
 mod collection_search;
 mod error;
+mod hash;
 mod message;
 mod node_id;
 mod repeated;
 
 pub use self::{
+  bundle_create::BundleCreateRequest,
   collection_create::CollectionCreateRequest,
   collection_search::CollectionSearchRequest,
   error::{Error, ErrorKind},
@@ -79,10 +83,13 @@ pub mod tests {
   #[test]
   fn round_trips() {
     test_round_trip::<Pubkey, svc::Pubkey>();
+    test_round_trip::<Hash, svc::Hash>();
     test_round_trip::<NodeId, svc::NodeId>();
     test_round_trip::<CollectionId, svc::CollectionId>();
+    test_round_trip::<BundleId, svc::BundleId>();
     test_round_trip::<CollectionSearchRequest, svc::CollectionSearchRequest>();
     test_round_trip::<CollectionCreateRequest, svc::CollectionCreateRequest>();
+    test_round_trip::<BundleCreateRequest, svc::BundleCreateRequest>();
   }
 
   macro_rules! round_trip_response_test {
@@ -113,4 +120,11 @@ pub mod tests {
     payload:  Vec<CollectionId>,
     response: svc::CollectionSearchResponse,
   }
+
+  round_trip_response_test! {
+    name:     bundle_create_response,
+    payload:  BundleId,
+    response: svc::BundleCreateResponse,
+  }
+
 }

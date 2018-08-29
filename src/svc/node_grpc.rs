@@ -25,6 +25,8 @@ pub trait Node {
     fn collection_create(&self, o: ::grpc::RequestOptions, p: super::node::CollectionCreateRequest) -> ::grpc::SingleResponse<super::node::CollectionCreateResponse>;
 
     fn collection_search(&self, o: ::grpc::RequestOptions, p: super::node::CollectionSearchRequest) -> ::grpc::SingleResponse<super::node::CollectionSearchResponse>;
+
+    fn bundle_create(&self, o: ::grpc::RequestOptions, p: super::node::BundleCreateRequest) -> ::grpc::SingleResponse<super::node::BundleCreateResponse>;
 }
 
 // client
@@ -33,6 +35,7 @@ pub struct NodeClient {
     grpc_client: ::grpc::Client,
     method_CollectionCreate: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::node::CollectionCreateRequest, super::node::CollectionCreateResponse>>,
     method_CollectionSearch: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::node::CollectionSearchRequest, super::node::CollectionSearchResponse>>,
+    method_BundleCreate: ::std::sync::Arc<::grpc::rt::MethodDescriptor<super::node::BundleCreateRequest, super::node::BundleCreateResponse>>,
 }
 
 impl NodeClient {
@@ -47,6 +50,12 @@ impl NodeClient {
             }),
             method_CollectionSearch: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
                 name: "/Node/CollectionSearch".to_string(),
+                streaming: ::grpc::rt::GrpcStreaming::Unary,
+                req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+            }),
+            method_BundleCreate: ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
+                name: "/Node/BundleCreate".to_string(),
                 streaming: ::grpc::rt::GrpcStreaming::Unary,
                 req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
                 resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
@@ -73,6 +82,10 @@ impl Node for NodeClient {
 
     fn collection_search(&self, o: ::grpc::RequestOptions, p: super::node::CollectionSearchRequest) -> ::grpc::SingleResponse<super::node::CollectionSearchResponse> {
         self.grpc_client.call_unary(o, p, self.method_CollectionSearch.clone())
+    }
+
+    fn bundle_create(&self, o: ::grpc::RequestOptions, p: super::node::BundleCreateRequest) -> ::grpc::SingleResponse<super::node::BundleCreateResponse> {
+        self.grpc_client.call_unary(o, p, self.method_BundleCreate.clone())
     }
 }
 
@@ -108,6 +121,18 @@ impl NodeServer {
                     {
                         let handler_copy = handler_arc.clone();
                         ::grpc::rt::MethodHandlerUnary::new(move |o, p| handler_copy.collection_search(o, p))
+                    },
+                ),
+                ::grpc::rt::ServerMethod::new(
+                    ::std::sync::Arc::new(::grpc::rt::MethodDescriptor {
+                        name: "/Node/BundleCreate".to_string(),
+                        streaming: ::grpc::rt::GrpcStreaming::Unary,
+                        req_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                        resp_marshaller: Box::new(::grpc::protobuf::MarshallerProtobuf),
+                    }),
+                    {
+                        let handler_copy = handler_arc.clone();
+                        ::grpc::rt::MethodHandlerUnary::new(move |o, p| handler_copy.bundle_create(o, p))
                     },
                 ),
             ],

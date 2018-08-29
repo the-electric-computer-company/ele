@@ -1,6 +1,6 @@
 use common::*;
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub struct CollectionId {
   pub pubkey: Pubkey,
 }

@@ -18,25 +18,33 @@ extern crate grpc;
 extern crate protobuf;
 extern crate rand;
 extern crate rusqlite;
+extern crate serde;
+extern crate serde_cbor;
 extern crate sha2;
 extern crate tls_api;
 extern crate tls_api_native_tls;
 extern crate uuid;
 
 #[macro_use]
+extern crate serde_derive;
+
+#[macro_use]
 mod show;
 
 #[macro_use]
 pub mod api;
+mod bundle_id;
 mod collection_id;
 mod common;
 mod default;
 mod error;
+mod hash;
 mod library;
 mod node;
 mod node_id;
 mod platform;
 pub mod pubkey;
+mod record;
 mod svc;
 
 use common::*;
